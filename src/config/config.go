@@ -9,8 +9,9 @@ type Database struct {
 	Host     string `mapstructure:"host"`
 	Port     int    `mapstructure:"port"`
 	Name     string `mapstructure:"name"`
-	User     string `mapstructure:"username"`
+	Username string `mapstructure:"username"`
 	Password string `mapstructure:"password"`
+	SSL      string `mapstructure:"ssl"`
 }
 
 type App struct {
@@ -19,8 +20,8 @@ type App struct {
 }
 
 type Config struct {
-	Database Database `mapstructure:"database"`
 	App      App      `mapstructure:"app"`
+	Database Database `mapstructure:"database"`
 }
 
 func LoadConfig() (config *Config, err error) {
