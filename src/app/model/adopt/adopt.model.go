@@ -1,4 +1,4 @@
-package like
+package adopt
 
 import (
 	"github.com/google/uuid"
@@ -7,7 +7,7 @@ import (
 	"github.com/isd-sgcu/johnjud-backend/src/app/model/user"
 )
 
-type Like struct {
+type Adopt struct {
 	model.Base
 	PetID  *uuid.UUID `json:"pet_id" gorm:"index:idx_name,unique"`
 	Pet    *pet.Pet   `json:"pet" gorm:"foreignKey:PetID;constraint:OnUpdate:CASCADE;OnDelete:SET NULL;"`
