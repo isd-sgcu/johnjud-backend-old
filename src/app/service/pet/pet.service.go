@@ -83,6 +83,14 @@ func (s *Service) Create(_ context.Context, req *proto.CreatePetRequest) (res *p
 	return &proto.CreatePetResponse{Pet: RawToDto(raw, imgUrl)}, nil
 }
 
+func RawToDtoList(in *[]*pet.Pet) []*proto.Pet {
+	var result []*proto.Pet
+	for _, e := range *in {
+		result = append(result, RawToDto(e, []string{""}))
+	}
+	return result
+}
+
 func RawToDto(in *pet.Pet, imgUrl []string) *proto.Pet {
 	return &proto.Pet{
 		Id:           in.ID.String(),
@@ -154,12 +162,4 @@ func DtoToRaw(in *proto.Pet) (res *pet.Pet, err error) {
 		Address:      in.Address,
 		Contact:      in.Contact,
 	}, nil
-}
-
-func RawToDtoList(in *[]*pet.Pet) []*proto.Pet {
-	var result []*proto.Pet
-	for _, e := range *in {
-		result = append(result, RawToDto(e, []string{}))
-	}
-	return result
 }

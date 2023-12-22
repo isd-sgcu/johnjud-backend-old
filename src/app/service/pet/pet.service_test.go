@@ -34,7 +34,7 @@ type PetServiceTest struct {
 	UpdatePetReqMock *proto.UpdatePetRequest
 }
 
-func TestUserService(t *testing.T) {
+func TestPetService(t *testing.T) {
 	suite.Run(t, new(PetServiceTest))
 }
 
