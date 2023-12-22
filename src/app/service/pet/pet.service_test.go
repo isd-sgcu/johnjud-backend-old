@@ -2,10 +2,13 @@ package pet
 
 import (
 	"context"
+	"errors"
 	"testing"
 	"time"
 
 	mock "github.com/isd-sgcu/johnjud-backend/src/mock/pet"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"github.com/bxcodec/faker/v3"
 	"github.com/google/uuid"
@@ -20,8 +23,8 @@ import (
 type PetServiceTest struct {
 	suite.Suite
 	Pet              *pet.Pet
-	Pets             []*pet.Pet
 	UpdatePet        *pet.Pet
+	Pets             []*pet.Pet
 	PetDto           *proto.Pet
 	CreatePetReqMock *proto.CreatePetRequest
 	UpdatePetReqMock *proto.UpdatePetRequest
@@ -75,6 +78,67 @@ func (t *PetServiceTest) SetupTest() {
 		Address:      t.Pet.Address,
 		Contact:      t.Pet.Contact,
 	}
+
+	t.CreatePetReqMock = &proto.CreatePetRequest{
+		Pet: &proto.Pet{
+			Type:         t.Pet.Type,
+			Species:      t.Pet.Species,
+			Name:         t.Pet.Name,
+			Birthdate:    t.Pet.Birthdate,
+			Gender:       proto.Gender(t.Pet.Gender),
+			Habit:        t.Pet.Habit,
+			Caption:      t.Pet.Caption,
+			Status:       proto.PetStatus(t.Pet.Status),
+			ImageUrls:    []string{""},
+			IsSterile:    t.Pet.IsSterile,
+			IsVaccinated: t.Pet.IsVaccinated,
+			IsVisible:    t.Pet.IsVaccinated,
+			IsClubPet:    t.Pet.IsClubPet,
+			Background:   t.Pet.Background,
+			Address:      t.Pet.Address,
+			Contact:      t.Pet.Contact,
+		},
+	}
+
+	t.UpdatePetReqMock = &proto.UpdatePetRequest{
+		Pet: &proto.Pet{
+			Id:           t.Pet.ID.String(),
+			Type:         t.Pet.Type,
+			Species:      t.Pet.Species,
+			Name:         t.Pet.Name,
+			Birthdate:    t.Pet.Birthdate,
+			Gender:       proto.Gender(t.Pet.Gender),
+			Habit:        t.Pet.Habit,
+			Caption:      t.Pet.Caption,
+			Status:       proto.PetStatus(t.Pet.Status),
+			ImageUrls:    []string{""},
+			IsSterile:    t.Pet.IsSterile,
+			IsVaccinated: t.Pet.IsVaccinated,
+			IsVisible:    t.Pet.IsVisible,
+			IsClubPet:    t.Pet.IsClubPet,
+			Background:   t.Pet.Background,
+			Address:      t.Pet.Address,
+			Contact:      t.Pet.Contact,
+		},
+	}
+
+	t.UpdatePet = &pet.Pet{
+		Type:         t.Pet.Type,
+		Species:      t.Pet.Species,
+		Name:         t.Pet.Name,
+		Birthdate:    t.Pet.Birthdate,
+		Gender:       t.Pet.Gender,
+		Habit:        t.Pet.Habit,
+		Caption:      t.Pet.Caption,
+		Status:       t.Pet.Status,
+		IsSterile:    t.Pet.IsSterile,
+		IsVaccinated: t.Pet.IsVaccinated,
+		IsVisible:    t.Pet.IsVisible,
+		IsClubPet:    t.Pet.IsClubPet,
+		Background:   t.Pet.Background,
+		Address:      t.Pet.Address,
+		Contact:      t.Pet.Contact,
+	}
 }
 
 func (t *PetServiceTest) TestFindOneSuccess() {
@@ -96,7 +160,7 @@ func (t *PetServiceTest) TestFindOneSuccess() {
 func (t *PetServiceTest) TestFindAllSuccess() {
 	var pets []*pet.Pet
 
-	want := &proto.FindAllPetResponse{Pets: createPetDto(t.Pets)}
+	want := &proto.FindAllPetResponse{Pets: createPetsDto(t.Pets)}
 
 	r := mock.RepositoryMock{}
 	r.On("FindAll", pets).Return(&t.Pets, nil)
@@ -109,7 +173,7 @@ func (t *PetServiceTest) TestFindAllSuccess() {
 	assert.Equal(t.T(), want, actual)
 }
 
-func createPetDto(in []*pet.Pet) []*proto.Pet {
+func createPetsDto(in []*pet.Pet) []*proto.Pet {
 	var result []*proto.Pet
 
 	for _, p := range in {
@@ -137,4 +201,69 @@ func createPetDto(in []*pet.Pet) []*proto.Pet {
 	}
 
 	return result
+}
+
+func (t *PetServiceTest) TestCreateSuccess() {
+	want := &proto.CreatePetResponse{Pet: t.PetDto}
+
+	repo := &mock.RepositoryMock{}
+
+	in := &pet.Pet{
+		Type:         t.Pet.Type,
+		Species:      t.Pet.Species,
+		Name:         t.Pet.Name,
+		Birthdate:    t.Pet.Birthdate,
+		Gender:       t.Pet.Gender,
+		Habit:        t.Pet.Habit,
+		Caption:      t.Pet.Caption,
+		Status:       t.Pet.Status,
+		IsSterile:    t.Pet.IsSterile,
+		IsVaccinated: t.Pet.IsVaccinated,
+		IsVisible:    t.Pet.IsVisible,
+		IsClubPet:    t.Pet.IsClubPet,
+		Background:   t.Pet.Background,
+		Address:      t.Pet.Address,
+		Contact:      t.Pet.Contact,
+	}
+
+	repo.On("Create", in).Return(t.Pet, nil)
+	srv := NewService(repo)
+
+	actual, err := srv.Create(context.Background(), t.CreatePetReqMock)
+
+	assert.Nil(t.T(), err)
+	assert.Equal(t.T(), want, actual)
+}
+
+func (t *PetServiceTest) TestCreateInternalErr() {
+	repo := &mock.RepositoryMock{}
+
+	in := &pet.Pet{
+		Type:         t.Pet.Type,
+		Species:      t.Pet.Species,
+		Name:         t.Pet.Name,
+		Birthdate:    t.Pet.Birthdate,
+		Gender:       t.Pet.Gender,
+		Habit:        t.Pet.Habit,
+		Caption:      t.Pet.Caption,
+		Status:       t.Pet.Status,
+		IsSterile:    t.Pet.IsSterile,
+		IsVaccinated: t.Pet.IsVaccinated,
+		IsVisible:    t.Pet.IsVisible,
+		IsClubPet:    t.Pet.IsClubPet,
+		Background:   t.Pet.Background,
+		Address:      t.Pet.Address,
+		Contact:      t.Pet.Contact,
+	}
+
+	repo.On("Create", in).Return(nil, errors.New("something wrong"))
+	srv := NewService(repo)
+
+	actual, err := srv.Create(context.Background(), t.CreatePetReqMock)
+
+	st, ok := status.FromError(err)
+
+	assert.True(t.T(), ok)
+	assert.Nil(t.T(), actual)
+	assert.Equal(t.T(), codes.Internal, st.Code())
 }

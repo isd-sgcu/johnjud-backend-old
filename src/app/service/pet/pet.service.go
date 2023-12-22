@@ -2,6 +2,7 @@ package pet
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -54,12 +55,14 @@ func (s Service) FindOne(_ context.Context, req *proto.FindOnePetRequest) (res *
 
 func (s *Service) Create(_ context.Context, req *proto.CreatePetRequest) (res *proto.CreatePetResponse, err error) {
 	raw, _ := DtoToRaw(req.Pet)
-	imgUrl := []string{}
+	imgUrl := []string{""}
 
 	err = s.repository.Create(raw)
 	if err != nil {
 		return nil, status.Error(codes.Internal, "failed to create pet")
 	}
+
+	fmt.Println(RawToDto(raw, []string{""}))
 
 	return &proto.CreatePetResponse{Pet: RawToDto(raw, imgUrl)}, nil
 }
@@ -104,11 +107,6 @@ func DtoToRaw(in *proto.Pet) (res *pet.Pet, err error) {
 		if err != nil {
 			return nil, err
 		}
-	}
-
-	id, err = uuid.Parse(in.Id)
-	if err != nil {
-		return nil, err
 	}
 
 	switch in.Gender {
