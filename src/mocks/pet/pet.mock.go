@@ -1,45 +1,34 @@
 package pet
 
 import (
+	"github.com/isd-sgcu/johnjud-backend/src/app/model/pet"
 	"github.com/stretchr/testify/mock"
 )
 
-// RepositoryMock is a mock type for the IRepository interface
 type RepositoryMock struct {
 	mock.Mock
 }
 
-// FindAll mocks the FindAll method
-func (r *RepositoryMock) FindAll() error {
+func (r *RepositoryMock) FindAll(result *[]*pet.Pet) error {
 	// unimplemented for now
 	return nil
 }
 
-// FindOne mocks the FindOne method
-func (r *RepositoryMock) FindOne() error {
+func (r *RepositoryMock) FindOne(id string, result *[]*pet.Pet) error {
 	// unimplemented for now
 	return nil
 }
 
-// Create mocks the Create method
-func (r *RepositoryMock) Create() error {
+func (r *RepositoryMock) Create(in *pet.Pet) error {
 	// unimplemented for now
 	return nil
 }
 
-// Update mocks the Update method
-func (r *RepositoryMock) Update() error {
+func (r *RepositoryMock) Update(id string, result *pet.Pet) error {
 	// unimplemented for now
 	return nil
 }
 
-// ChangeView mocks the ChangeView method
-func (r *RepositoryMock) ChangeView() error {
-	// unimplemented for now
-	return nil
-}
-
-// Delete mocks the Delete method
 func (r *RepositoryMock) Delete(id string) error {
 	args := r.Called(id)
 	return args.Error(0)

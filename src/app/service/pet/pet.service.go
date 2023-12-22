@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/isd-sgcu/johnjud-backend/src/app/model/pet"
 	proto "github.com/isd-sgcu/johnjud-go-proto/johnjud/backend/pet/v1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -11,24 +12,23 @@ import (
 )
 
 type Service struct {
-	repo IRepository
+	repository IRepository
 }
 
 type IRepository interface {
-	FindAll() error
-	FindOne() error
-	Create() error
-	Update() error
-	ChangeView() error
-	Delete(string) error
+	FindAll(result *[]*pet.Pet) error
+	FindOne(id string, result *[]*pet.Pet) error
+	Create(in *pet.Pet) error
+	Update(id string, result *pet.Pet) error
+	Delete(id string) error
 }
 
-func NewService(repo IRepository) *Service {
-	return &Service{repo: repo}
+func NewService(repository IRepository) *Service {
+	return &Service{repository: repository}
 }
 
 func (s *Service) Delete(ctx context.Context, req *proto.DeletePetRequest) (*proto.DeletePetResponse, error) {
-	err := s.repo.Delete(req.Id)
+	err := s.repository.Delete(req.Id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, status.Error(codes.NotFound, "pet not found")
@@ -38,27 +38,18 @@ func (s *Service) Delete(ctx context.Context, req *proto.DeletePetRequest) (*pro
 	return &proto.DeletePetResponse{Success: true}, nil
 }
 
-// ChangeView implements v1.PetServiceServer.
-func (*Service) ChangeView(context.Context, *proto.ChangeViewPetRequest) (*proto.ChangeViewPetResponse, error) {
-	panic("unimplemented")
-}
-
-// Create implements v1.PetServiceServer.
 func (*Service) Create(context.Context, *proto.CreatePetRequest) (*proto.CreatePetResponse, error) {
 	panic("unimplemented")
 }
 
-// FindAll implements v1.PetServiceServer.
 func (*Service) FindAll(context.Context, *proto.FindAllPetRequest) (*proto.FindAllPetResponse, error) {
 	panic("unimplemented")
 }
 
-// FindOne implements v1.PetServiceServer.
 func (*Service) FindOne(context.Context, *proto.FindOnePetRequest) (*proto.FindOnePetResponse, error) {
 	panic("unimplemented")
 }
 
-// Update implements v1.PetServiceServer.
 func (*Service) Update(context.Context, *proto.UpdatePetRequest) (*proto.UpdatePetResponse, error) {
 	panic("unimplemented")
 }
