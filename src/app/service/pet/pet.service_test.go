@@ -142,7 +142,6 @@ func (t *PetServiceTest) SetupTest() {
 }
 
 func (t *PetServiceTest) TestFindOneSuccess() {
-
 	t.PetDto.ImageUrls = []string{""}
 
 	want := &proto.FindOnePetResponse{Pet: t.PetDto}
@@ -171,6 +170,20 @@ func (t *PetServiceTest) TestFindAllSuccess() {
 
 	assert.Nil(t.T(), err)
 	assert.Equal(t.T(), want, actual)
+}
+
+func (t *PetServiceTest) TestFindOneNotFound() {
+	repo := &mock.RepositoryMock{}
+	repo.On("FindOne", t.Pet.ID.String(), &pet.Pet{}).Return(nil, errors.New("Not found event"))
+
+	srv := NewService(repo)
+	actual, err := srv.FindOne(context.Background(), &proto.FindOnePetRequest{Id: t.Pet.ID.String()})
+
+	st, ok := status.FromError(err)
+
+	assert.True(t.T(), ok)
+	assert.Nil(t.T(), actual)
+	assert.Equal(t.T(), codes.NotFound, st.Code())
 }
 
 func createPetsDto(in []*pet.Pet) []*proto.Pet {
