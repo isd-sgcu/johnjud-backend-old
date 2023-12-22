@@ -3,6 +3,7 @@ package pet
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"time"
 
@@ -80,13 +81,15 @@ func (s *Service) Create(_ context.Context, req *proto.CreatePetRequest) (res *p
 		return nil, status.Error(codes.Internal, "failed to create pet")
 	}
 
+	fmt.Println(RawToDto(raw, []string{}))
+
 	return &proto.CreatePetResponse{Pet: RawToDto(raw, imgUrl)}, nil
 }
 
 func RawToDtoList(in *[]*pet.Pet) []*proto.Pet {
 	var result []*proto.Pet
 	for _, e := range *in {
-		result = append(result, RawToDto(e, []string{""}))
+		result = append(result, RawToDto(e, []string{}))
 	}
 	return result
 }

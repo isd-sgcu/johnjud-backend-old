@@ -27,8 +27,8 @@ import (
 type PetServiceTest struct {
 	suite.Suite
 	Pet              *pet.Pet
-	Pets             []*pet.Pet
 	UpdatePet        *pet.Pet
+	Pets             []*pet.Pet
 	PetDto           *proto.Pet
 	CreatePetReqMock *proto.CreatePetRequest
 	UpdatePetReqMock *proto.UpdatePetRequest
@@ -81,6 +81,67 @@ func (t *PetServiceTest) SetupTest() {
 		Address:      t.Pet.Address,
 		Contact:      t.Pet.Contact,
 		ImageUrls:    []string{},
+	}
+
+	t.CreatePetReqMock = &proto.CreatePetRequest{
+		Pet: &proto.Pet{
+			Type:         t.Pet.Type,
+			Species:      t.Pet.Species,
+			Name:         t.Pet.Name,
+			Birthdate:    t.Pet.Birthdate,
+			Gender:       proto.Gender(t.Pet.Gender),
+			Habit:        t.Pet.Habit,
+			Caption:      t.Pet.Caption,
+			Status:       proto.PetStatus(t.Pet.Status),
+			ImageUrls:    []string{},
+			IsSterile:    t.Pet.IsSterile,
+			IsVaccinated: t.Pet.IsVaccinated,
+			IsVisible:    t.Pet.IsVaccinated,
+			IsClubPet:    t.Pet.IsClubPet,
+			Background:   t.Pet.Background,
+			Address:      t.Pet.Address,
+			Contact:      t.Pet.Contact,
+		},
+	}
+
+	t.UpdatePetReqMock = &proto.UpdatePetRequest{
+		Pet: &proto.Pet{
+			Id:           t.Pet.ID.String(),
+			Type:         t.Pet.Type,
+			Species:      t.Pet.Species,
+			Name:         t.Pet.Name,
+			Birthdate:    t.Pet.Birthdate,
+			Gender:       proto.Gender(t.Pet.Gender),
+			Habit:        t.Pet.Habit,
+			Caption:      t.Pet.Caption,
+			Status:       proto.PetStatus(t.Pet.Status),
+			ImageUrls:    []string{},
+			IsSterile:    t.Pet.IsSterile,
+			IsVaccinated: t.Pet.IsVaccinated,
+			IsVisible:    t.Pet.IsVisible,
+			IsClubPet:    t.Pet.IsClubPet,
+			Background:   t.Pet.Background,
+			Address:      t.Pet.Address,
+			Contact:      t.Pet.Contact,
+		},
+	}
+
+	t.UpdatePet = &pet.Pet{
+		Type:         t.Pet.Type,
+		Species:      t.Pet.Species,
+		Name:         t.Pet.Name,
+		Birthdate:    t.Pet.Birthdate,
+		Gender:       t.Pet.Gender,
+		Habit:        t.Pet.Habit,
+		Caption:      t.Pet.Caption,
+		Status:       t.Pet.Status,
+		IsSterile:    t.Pet.IsSterile,
+		IsVaccinated: t.Pet.IsVaccinated,
+		IsVisible:    t.Pet.IsVisible,
+		IsClubPet:    t.Pet.IsClubPet,
+		Background:   t.Pet.Background,
+		Address:      t.Pet.Address,
+		Contact:      t.Pet.Contact,
 	}
 
 	t.CreatePetReqMock = &proto.CreatePetRequest{
