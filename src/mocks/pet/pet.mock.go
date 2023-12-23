@@ -9,19 +9,34 @@ type RepositoryMock struct {
 	mock.Mock
 }
 
-func (r *RepositoryMock) FindAll(result *[]*pet.Pet) error {
-	// unimplemented for now
-	return nil
-}
+func (r *RepositoryMock) FindOne(id string, result *pet.Pet) error {
+	args := r.Called(id, result)
 
-func (r *RepositoryMock) FindOne(id string, result *[]*pet.Pet) error {
-	// unimplemented for now
-	return nil
+	if args.Get(0) != nil {
+		*result = *args.Get(0).(*pet.Pet)
+	}
+
+	return args.Error(1)
 }
 
 func (r *RepositoryMock) Create(in *pet.Pet) error {
-	// unimplemented for now
-	return nil
+	args := r.Called(in)
+
+	if args.Get(0) != nil {
+		*in = *args.Get(0).(*pet.Pet)
+	}
+
+	return args.Error(1)
+}
+
+func (r *RepositoryMock) FindAll(result *[]*pet.Pet) error {
+	args := r.Called(*result)
+
+	if args.Get(0) != nil {
+		*result = *args.Get(0).(*[]*pet.Pet)
+	}
+
+	return args.Error(1)
 }
 
 func (r *RepositoryMock) Update(id string, result *pet.Pet) error {
