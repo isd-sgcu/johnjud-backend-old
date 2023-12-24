@@ -428,7 +428,7 @@ func (t *PetServiceTest) TestUpdateNotFound() {
 	repo := &mock.RepositoryMock{}
 	repo.On("Update", t.Pet.ID.String(), t.UpdatePet).Return(nil, errors.New("Not found pet"))
 	imgSrv := new(img_mock.ServiceMock)
-	imgSrv.On("FindByPetId", t.Pet.ID.String()).Return(nil, errors.New("No images with this pet id"))
+	imgSrv.On("FindByPetId", t.Pet.ID.String()).Return(t.Images, nil)
 
 	srv := NewService(repo, imgSrv)
 	actual, err := srv.Update(context.Background(), t.UpdatePetReqMock)
