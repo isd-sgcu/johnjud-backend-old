@@ -51,7 +51,10 @@ func (s *Service) Delete(ctx context.Context, req *proto.DeletePetRequest) (*pro
 }
 
 func (s *Service) Update(_ context.Context, req *proto.UpdatePetRequest) (res *proto.UpdatePetResponse, err error) {
-	raw, _ := DtoToRaw(req.Pet)
+	raw, err := DtoToRaw(req.Pet)
+	if err != nil {
+		return nil, status.Error(codes.Internal, "error converting dto to raw")
+	}
 
 	err = s.repository.Update(req.Pet.Id, raw)
 	if err != nil {
@@ -72,7 +75,10 @@ func (s *Service) ChangeView(_ context.Context, req *proto.ChangeViewPetRequest)
 	if err != nil {
 		return nil, status.Error(codes.NotFound, "pet not found")
 	}
-	pet, _ := DtoToRaw(petData.Pet)
+	pet, err := DtoToRaw(petData.Pet)
+	if err != nil {
+		return nil, status.Error(codes.Internal, "error converting dto to raw")
+	}
 	pet.IsVisible = req.Visible
 
 	err = s.repository.Update(req.Id, pet)
@@ -107,7 +113,11 @@ func (s Service) FindOne(_ context.Context, req *proto.FindOnePetRequest) (res *
 }
 
 func (s *Service) Create(_ context.Context, req *proto.CreatePetRequest) (res *proto.CreatePetResponse, err error) {
-	raw, _ := DtoToRaw(req.Pet)
+	raw, err := DtoToRaw(req.Pet)
+	if err != nil {
+		return nil, status.Error(codes.Internal, "error converting dto to raw")
+	}
+
 	imgUrls := []string{}
 
 	err = s.repository.Create(raw)
