@@ -67,6 +67,22 @@ func (s *Service) Update(_ context.Context, req *proto.UpdatePetRequest) (res *p
 	return &proto.UpdatePetResponse{Pet: RawToDto(raw, imageUrls)}, nil
 }
 
+func (s *Service) ChangeView(_ context.Context, req *proto.ChangeViewPetRequest) (res *proto.ChangeViewPetResponse, err error) {
+	petData, err := s.FindOne(context.Background(), &proto.FindOnePetRequest{Id: req.Id})
+	if err != nil {
+		return nil, status.Error(codes.NotFound, "pet not found")
+	}
+	pet, _ := DtoToRaw(petData.Pet)
+	pet.IsVisible = req.Visible
+
+	err = s.repository.Update(req.Id, pet)
+	if err != nil {
+		return nil, status.Error(codes.NotFound, "pet not found")
+	}
+
+	return &proto.ChangeViewPetResponse{Success: true}, nil
+}
+
 func (s *Service) FindAll(_ context.Context, req *proto.FindAllPetRequest) (res *proto.FindAllPetResponse, err error) {
 	var pets []*pet.Pet
 

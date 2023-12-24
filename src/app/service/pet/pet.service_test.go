@@ -28,14 +28,16 @@ import (
 
 type PetServiceTest struct {
 	suite.Suite
-	Pet              *pet.Pet
-	UpdatePet        *pet.Pet
-	Pets             []*pet.Pet
-	PetDto           *proto.Pet
-	CreatePetReqMock *proto.CreatePetRequest
-	UpdatePetReqMock *proto.UpdatePetRequest
-	Images           []*img_proto.Image
-	ImageUrls        []string
+	Pet                  *pet.Pet
+	UpdatePet            *pet.Pet
+	ChangeViewPet        *pet.Pet
+	Pets                 []*pet.Pet
+	PetDto               *proto.Pet
+	CreatePetReqMock     *proto.CreatePetRequest
+	UpdatePetReqMock     *proto.UpdatePetRequest
+	ChangeViewPetReqMock *proto.ChangeViewPetRequest
+	Images               []*img_proto.Image
+	ImageUrls            []string
 }
 
 func TestPetService(t *testing.T) {
@@ -129,6 +131,30 @@ func (t *PetServiceTest) SetupTest() {
 		Contact:      t.Pet.Contact,
 	}
 
+	t.ChangeViewPet = &pet.Pet{
+		Base: model.Base{
+			ID:        t.Pet.Base.ID,
+			CreatedAt: t.Pet.Base.CreatedAt,
+			UpdatedAt: t.Pet.Base.UpdatedAt,
+			DeletedAt: t.Pet.Base.DeletedAt,
+		},
+		Type:         t.Pet.Type,
+		Species:      t.Pet.Species,
+		Name:         t.Pet.Name,
+		Birthdate:    t.Pet.Birthdate,
+		Gender:       t.Pet.Gender,
+		Habit:        t.Pet.Habit,
+		Caption:      t.Pet.Caption,
+		Status:       t.Pet.Status,
+		IsSterile:    t.Pet.IsSterile,
+		IsVaccinated: t.Pet.IsVaccinated,
+		IsVisible:    false,
+		IsClubPet:    t.Pet.IsClubPet,
+		Background:   t.Pet.Background,
+		Address:      t.Pet.Address,
+		Contact:      t.Pet.Contact,
+	}
+
 	t.CreatePetReqMock = &proto.CreatePetRequest{
 		Pet: &proto.Pet{
 			Type:         t.Pet.Type,
@@ -170,6 +196,11 @@ func (t *PetServiceTest) SetupTest() {
 			Address:      t.Pet.Address,
 			Contact:      t.Pet.Contact,
 		},
+	}
+
+	t.ChangeViewPetReqMock = &proto.ChangeViewPetRequest{
+		Id:      t.Pet.ID.String(),
+		Visible: false,
 	}
 }
 func (t *PetServiceTest) TestDeleteSuccess() {
@@ -401,6 +432,37 @@ func (t *PetServiceTest) TestUpdateNotFound() {
 
 	srv := NewService(repo, imgSrv)
 	actual, err := srv.Update(context.Background(), t.UpdatePetReqMock)
+
+	st, ok := status.FromError(err)
+
+	assert.True(t.T(), ok)
+	assert.Nil(t.T(), actual)
+	assert.Equal(t.T(), codes.NotFound, st.Code())
+}
+
+func (t *PetServiceTest) TestChangeViewSuccess() {
+	want := &proto.ChangeViewPetResponse{Success: true}
+
+	repo := &mock.RepositoryMock{}
+	repo.On("FindOne", t.Pet.ID.String(), &pet.Pet{}).Return(t.Pet, nil)
+	repo.On("Update", t.Pet.ID.String(), t.ChangeViewPet).Return(t.ChangeViewPet, nil)
+	imgSrv := new(img_mock.ServiceMock)
+
+	srv := NewService(repo, imgSrv)
+	actual, err := srv.ChangeView(context.Background(), t.ChangeViewPetReqMock)
+
+	assert.Nil(t.T(), err)
+	assert.Equal(t.T(), want, actual)
+}
+
+func (t *PetServiceTest) TestChangeViewNotFound() {
+	repo := &mock.RepositoryMock{}
+	repo.On("FindOne", t.Pet.ID.String(), &pet.Pet{}).Return(nil, errors.New("Not found pet"))
+	repo.On("Update", t.Pet.ID.String(), t.UpdatePet).Return(nil, errors.New("Not found pet"))
+	imgSrv := new(img_mock.ServiceMock)
+
+	srv := NewService(repo, imgSrv)
+	actual, err := srv.ChangeView(context.Background(), t.ChangeViewPetReqMock)
 
 	st, ok := status.FromError(err)
 
