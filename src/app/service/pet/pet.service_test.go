@@ -83,50 +83,13 @@ func (t *PetServiceTest) SetupTest() {
 		ImageUrls:    []string{},
 	}
 
-	t.CreatePetReqMock = &proto.CreatePetRequest{
-		Pet: &proto.Pet{
-			Type:         t.Pet.Type,
-			Species:      t.Pet.Species,
-			Name:         t.Pet.Name,
-			Birthdate:    t.Pet.Birthdate,
-			Gender:       proto.Gender(t.Pet.Gender),
-			Habit:        t.Pet.Habit,
-			Caption:      t.Pet.Caption,
-			Status:       proto.PetStatus(t.Pet.Status),
-			ImageUrls:    []string{},
-			IsSterile:    t.Pet.IsSterile,
-			IsVaccinated: t.Pet.IsVaccinated,
-			IsVisible:    t.Pet.IsVaccinated,
-			IsClubPet:    t.Pet.IsClubPet,
-			Background:   t.Pet.Background,
-			Address:      t.Pet.Address,
-			Contact:      t.Pet.Contact,
-		},
-	}
-
-	t.UpdatePetReqMock = &proto.UpdatePetRequest{
-		Pet: &proto.Pet{
-			Id:           t.Pet.ID.String(),
-			Type:         t.Pet.Type,
-			Species:      t.Pet.Species,
-			Name:         t.Pet.Name,
-			Birthdate:    t.Pet.Birthdate,
-			Gender:       proto.Gender(t.Pet.Gender),
-			Habit:        t.Pet.Habit,
-			Caption:      t.Pet.Caption,
-			Status:       proto.PetStatus(t.Pet.Status),
-			ImageUrls:    []string{},
-			IsSterile:    t.Pet.IsSterile,
-			IsVaccinated: t.Pet.IsVaccinated,
-			IsVisible:    t.Pet.IsVisible,
-			IsClubPet:    t.Pet.IsClubPet,
-			Background:   t.Pet.Background,
-			Address:      t.Pet.Address,
-			Contact:      t.Pet.Contact,
-		},
-	}
-
 	t.UpdatePet = &pet.Pet{
+		Base: model.Base{
+			ID:        t.Pet.Base.ID,
+			CreatedAt: t.Pet.Base.CreatedAt,
+			UpdatedAt: t.Pet.Base.UpdatedAt,
+			DeletedAt: t.Pet.Base.DeletedAt,
+		},
 		Type:         t.Pet.Type,
 		Species:      t.Pet.Species,
 		Name:         t.Pet.Name,
@@ -185,24 +148,6 @@ func (t *PetServiceTest) SetupTest() {
 			Address:      t.Pet.Address,
 			Contact:      t.Pet.Contact,
 		},
-	}
-
-	t.UpdatePet = &pet.Pet{
-		Type:         t.Pet.Type,
-		Species:      t.Pet.Species,
-		Name:         t.Pet.Name,
-		Birthdate:    t.Pet.Birthdate,
-		Gender:       t.Pet.Gender,
-		Habit:        t.Pet.Habit,
-		Caption:      t.Pet.Caption,
-		Status:       t.Pet.Status,
-		IsSterile:    t.Pet.IsSterile,
-		IsVaccinated: t.Pet.IsVaccinated,
-		IsVisible:    t.Pet.IsVisible,
-		IsClubPet:    t.Pet.IsClubPet,
-		Background:   t.Pet.Background,
-		Address:      t.Pet.Address,
-		Contact:      t.Pet.Contact,
 	}
 }
 func (t *PetServiceTest) TestDeleteSuccess() {
@@ -394,4 +339,31 @@ func (t *PetServiceTest) TestCreateInternalErr() {
 	assert.True(t.T(), ok)
 	assert.Nil(t.T(), actual)
 	assert.Equal(t.T(), codes.Internal, st.Code())
+}
+
+func (t *PetServiceTest) TestUpdateSuccess() {
+	want := &proto.UpdatePetResponse{Pet: t.PetDto}
+
+	repo := &mock.RepositoryMock{}
+	repo.On("Update", t.Pet.ID.String(), t.UpdatePet).Return(t.Pet, nil)
+
+	srv := NewService(repo)
+	actual, err := srv.Update(context.Background(), t.UpdatePetReqMock)
+
+	assert.Nil(t.T(), err)
+	assert.Equal(t.T(), want, actual)
+}
+
+func (t *PetServiceTest) TestUpdateNotFound() {
+	repo := &mock.RepositoryMock{}
+	repo.On("Update", t.Pet.ID.String(), t.UpdatePet).Return(nil, errors.New("Not found pet"))
+
+	srv := NewService(repo)
+	actual, err := srv.Update(context.Background(), t.UpdatePetReqMock)
+
+	st, ok := status.FromError(err)
+
+	assert.True(t.T(), ok)
+	assert.Nil(t.T(), actual)
+	assert.Equal(t.T(), codes.NotFound, st.Code())
 }

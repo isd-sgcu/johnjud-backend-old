@@ -45,8 +45,15 @@ func (s *Service) Delete(ctx context.Context, req *proto.DeletePetRequest) (*pro
 	return &proto.DeletePetResponse{Success: true}, nil
 }
 
-func (*Service) Update(context.Context, *proto.UpdatePetRequest) (*proto.UpdatePetResponse, error) {
-	panic("unimplemented")
+func (s *Service) Update(_ context.Context, req *proto.UpdatePetRequest) (res *proto.UpdatePetResponse, err error) {
+	raw, _ := DtoToRaw(req.Pet)
+
+	err = s.repository.Update(req.Pet.Id, raw)
+	if err != nil {
+		return nil, status.Error(codes.NotFound, "pet not found")
+	}
+
+	return &proto.UpdatePetResponse{Pet: RawToDto(raw, []string{})}, nil
 }
 
 func (s *Service) FindAll(_ context.Context, req *proto.FindAllPetRequest) (res *proto.FindAllPetResponse, err error) {

@@ -40,8 +40,13 @@ func (r *RepositoryMock) FindAll(result *[]*pet.Pet) error {
 }
 
 func (r *RepositoryMock) Update(id string, result *pet.Pet) error {
-	// unimplemented for now
-	return nil
+	args := r.Called(id, result)
+
+	if args.Get(0) != nil {
+		*result = *args.Get(0).(*pet.Pet)
+	}
+
+	return args.Error(1)
 }
 
 func (r *RepositoryMock) Delete(id string) error {
