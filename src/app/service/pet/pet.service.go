@@ -129,16 +129,16 @@ func DtoToRaw(in *proto.Pet) (res *pet.Pet, err error) {
 	}
 
 	switch in.Gender {
-	case 1:
+	case 0:
 		gender = petConst.MALE
-	case 2:
+	case 1:
 		gender = petConst.FEMALE
 	}
 
 	switch in.Status {
-	case 1:
+	case 0:
 		status = petConst.ADOPTED
-	case 2:
+	case 1:
 		status = petConst.FINDHOME
 	}
 

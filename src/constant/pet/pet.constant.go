@@ -3,13 +3,13 @@ package pet
 type Gender int
 
 const (
-	MALE   = 1
-	FEMALE = 2
+	MALE   = 0
+	FEMALE = 1
 )
 
 type Status int
 
 const (
-	ADOPTED  = 1
-	FINDHOME = 2
+	ADOPTED  = 0
+	FINDHOME = 1
 )
