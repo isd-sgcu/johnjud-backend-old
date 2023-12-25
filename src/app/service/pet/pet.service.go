@@ -3,7 +3,6 @@ package pet
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"time"
 
@@ -12,6 +11,7 @@ import (
 	"github.com/isd-sgcu/johnjud-backend/src/app/model/pet"
 	petConst "github.com/isd-sgcu/johnjud-backend/src/constant/pet"
 	proto "github.com/isd-sgcu/johnjud-go-proto/johnjud/backend/pet/v1"
+	image_proto "github.com/isd-sgcu/johnjud-go-proto/johnjud/file/image/v1"
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -19,7 +19,8 @@ import (
 )
 
 type Service struct {
-	repository IRepository
+	repository   IRepository
+	imageService ImageService
 }
 
 type IRepository interface {
@@ -30,8 +31,12 @@ type IRepository interface {
 	Delete(id string) error
 }
 
-func NewService(repository IRepository) *Service {
-	return &Service{repository: repository}
+type ImageService interface {
+	FindByPetId(petId string) ([]*image_proto.Image, error)
+}
+
+func NewService(repository IRepository, imageService ImageService) *Service {
+	return &Service{repository, imageService}
 }
 
 func (s *Service) Delete(ctx context.Context, req *proto.DeletePetRequest) (*proto.DeletePetResponse, error) {
@@ -45,8 +50,43 @@ func (s *Service) Delete(ctx context.Context, req *proto.DeletePetRequest) (*pro
 	return &proto.DeletePetResponse{Success: true}, nil
 }
 
-func (*Service) Update(context.Context, *proto.UpdatePetRequest) (*proto.UpdatePetResponse, error) {
-	panic("unimplemented")
+func (s *Service) Update(_ context.Context, req *proto.UpdatePetRequest) (res *proto.UpdatePetResponse, err error) {
+	raw, err := DtoToRaw(req.Pet)
+	if err != nil {
+		return nil, status.Error(codes.Internal, "error converting dto to raw")
+	}
+
+	err = s.repository.Update(req.Pet.Id, raw)
+	if err != nil {
+		return nil, status.Error(codes.NotFound, "pet not found")
+	}
+
+	images, err := s.imageService.FindByPetId(req.Pet.Id)
+	if err != nil {
+		return nil, status.Error(codes.Internal, "error querying image service")
+	}
+	imageUrls := ExtractImageUrls(images)
+
+	return &proto.UpdatePetResponse{Pet: RawToDto(raw, imageUrls)}, nil
+}
+
+func (s *Service) ChangeView(_ context.Context, req *proto.ChangeViewPetRequest) (res *proto.ChangeViewPetResponse, err error) {
+	petData, err := s.FindOne(context.Background(), &proto.FindOnePetRequest{Id: req.Id})
+	if err != nil {
+		return nil, status.Error(codes.NotFound, "pet not found")
+	}
+	pet, err := DtoToRaw(petData.Pet)
+	if err != nil {
+		return nil, status.Error(codes.Internal, "error converting dto to raw")
+	}
+	pet.IsVisible = req.Visible
+
+	err = s.repository.Update(req.Id, pet)
+	if err != nil {
+		return nil, status.Error(codes.NotFound, "pet not found")
+	}
+
+	return &proto.ChangeViewPetResponse{Success: true}, nil
 }
 
 func (s *Service) FindAll(_ context.Context, req *proto.FindAllPetRequest) (res *proto.FindAllPetResponse, err error) {
@@ -73,17 +113,19 @@ func (s Service) FindOne(_ context.Context, req *proto.FindOnePetRequest) (res *
 }
 
 func (s *Service) Create(_ context.Context, req *proto.CreatePetRequest) (res *proto.CreatePetResponse, err error) {
-	raw, _ := DtoToRaw(req.Pet)
-	imgUrl := []string{}
+	raw, err := DtoToRaw(req.Pet)
+	if err != nil {
+		return nil, status.Error(codes.Internal, "error converting dto to raw")
+	}
+
+	imgUrls := []string{}
 
 	err = s.repository.Create(raw)
 	if err != nil {
 		return nil, status.Error(codes.Internal, "failed to create pet")
 	}
 
-	fmt.Println(RawToDto(raw, []string{}))
-
-	return &proto.CreatePetResponse{Pet: RawToDto(raw, imgUrl)}, nil
+	return &proto.CreatePetResponse{Pet: RawToDto(raw, imgUrls)}, nil
 }
 
 func RawToDtoList(in *[]*pet.Pet) []*proto.Pet {
@@ -165,4 +207,12 @@ func DtoToRaw(in *proto.Pet) (res *pet.Pet, err error) {
 		Address:      in.Address,
 		Contact:      in.Contact,
 	}, nil
+}
+
+func ExtractImageUrls(in []*image_proto.Image) []string {
+	var result []string
+	for _, e := range in {
+		result = append(result, e.ImageUrl)
+	}
+	return result
 }
