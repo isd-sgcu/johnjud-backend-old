@@ -109,7 +109,14 @@ func (s Service) FindOne(_ context.Context, req *proto.FindOnePetRequest) (res *
 			Str("service", "pet").Str("module", "find one").Str("id", req.Id).Msg("Not found")
 		return nil, status.Error(codes.NotFound, err.Error())
 	}
-	return &proto.FindOnePetResponse{Pet: RawToDto(&pet, []string{})}, err
+
+	images, err := s.imageService.FindByPetId(req.Id)
+	if err != nil {
+		return nil, status.Error(codes.Internal, "error querying image service")
+	}
+	imageUrls := ExtractImageUrls(images)
+
+	return &proto.FindOnePetResponse{Pet: RawToDto(&pet, imageUrls)}, err
 }
 
 func (s *Service) Create(_ context.Context, req *proto.CreatePetRequest) (res *proto.CreatePetResponse, err error) {
