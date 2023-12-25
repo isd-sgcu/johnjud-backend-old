@@ -128,6 +128,25 @@ func (s *Service) Create(_ context.Context, req *proto.CreatePetRequest) (res *p
 	return &proto.CreatePetResponse{Pet: RawToDto(raw, imgUrls)}, nil
 }
 
+func (s *Service) AdoptPet(ctx context.Context, req *proto.AdoptPetRequest) (res *proto.AdoptPetResponse, err error) {
+	dtoPet, err := s.FindOne(context.Background(), &proto.FindOnePetRequest{Id: req.PetId})
+	if err != nil {
+		return nil, status.Error(codes.NotFound, "pet not found")
+	}
+	pet, err := DtoToRaw(dtoPet.Pet)
+	if err != nil {
+		return nil, status.Error(codes.Internal, "error converting dto to raw")
+	}
+	pet.AdoptBy = req.UserId
+
+	err = s.repository.Update(req.PetId, pet)
+	if err != nil {
+		return nil, status.Error(codes.NotFound, "pet not found")
+	}
+
+	return &proto.AdoptPetResponse{Success: true}, nil
+}
+
 func RawToDtoList(in *[]*pet.Pet) []*proto.Pet {
 	var result []*proto.Pet
 	for _, e := range *in {
@@ -155,6 +174,7 @@ func RawToDto(in *pet.Pet, imgUrl []string) *proto.Pet {
 		Background:   in.Background,
 		Address:      in.Address,
 		Contact:      in.Contact,
+		AdoptBy:      in.AdoptBy,
 	}
 }
 
@@ -206,6 +226,7 @@ func DtoToRaw(in *proto.Pet) (res *pet.Pet, err error) {
 		Background:   in.Background,
 		Address:      in.Address,
 		Contact:      in.Contact,
+		AdoptBy:      in.AdoptBy,
 	}, nil
 }
 
