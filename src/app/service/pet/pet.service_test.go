@@ -3,6 +3,7 @@ package pet
 import (
 	"context"
 	"errors"
+	"fmt"
 	"math/rand"
 	"testing"
 	"time"
@@ -259,8 +260,6 @@ func (t *PetServiceTest) TestDeleteWithUnexpectedError() {
 }
 
 func (t *PetServiceTest) TestFindOneSuccess() {
-	t.PetDto.ImageUrls = []string{}
-
 	want := &proto.FindOnePetResponse{Pet: t.PetDto}
 
 	repo := &mock.RepositoryMock{}
@@ -270,6 +269,7 @@ func (t *PetServiceTest) TestFindOneSuccess() {
 
 	srv := NewService(repo, imgSrv)
 	actual, err := srv.FindOne(context.Background(), &proto.FindOnePetRequest{Id: t.Pet.ID.String()})
+	fmt.Println(want, actual)
 
 	assert.Nil(t.T(), err)
 	assert.Equal(t.T(), want, actual)
