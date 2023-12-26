@@ -379,11 +379,6 @@ func createPets() []*pet.Pet {
 	return result
 }
 
-// TODO: test find one invalid ID
-func (t *PetServiceTest) TestFindOneInvalidID() {
-
-}
-
 func (t *PetServiceTest) createPetsDto(in []*pet.Pet, imageUrlsList [][]string) []*proto.Pet {
 	var result []*proto.Pet
 
