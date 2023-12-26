@@ -108,7 +108,6 @@ func (t *PetServiceTest) SetupTest() {
 		Address:      t.Pet.Address,
 		Contact:      t.Pet.Contact,
 		ImageUrls:    t.ImageUrls,
-		AdoptBy:      t.Pet.AdoptBy,
 	}
 
 	t.UpdatePet = &pet.Pet{
@@ -133,7 +132,6 @@ func (t *PetServiceTest) SetupTest() {
 		Background:   t.Pet.Background,
 		Address:      t.Pet.Address,
 		Contact:      t.Pet.Contact,
-		AdoptBy:      t.Pet.AdoptBy,
 	}
 
 	t.ChangeViewPet = &pet.Pet{
@@ -158,7 +156,6 @@ func (t *PetServiceTest) SetupTest() {
 		Background:   t.Pet.Background,
 		Address:      t.Pet.Address,
 		Contact:      t.Pet.Contact,
-		AdoptBy:      t.Pet.AdoptBy,
 	}
 
 	t.CreatePetReqMock = &proto.CreatePetRequest{
@@ -179,7 +176,6 @@ func (t *PetServiceTest) SetupTest() {
 			Background:   t.Pet.Background,
 			Address:      t.Pet.Address,
 			Contact:      t.Pet.Contact,
-			AdoptBy:      t.Pet.AdoptBy,
 		},
 	}
 
@@ -202,7 +198,6 @@ func (t *PetServiceTest) SetupTest() {
 			Background:   t.Pet.Background,
 			Address:      t.Pet.Address,
 			Contact:      t.Pet.Contact,
-			AdoptBy:      t.Pet.AdoptBy,
 		},
 	}
 
@@ -399,7 +394,6 @@ func (t *PetServiceTest) TestCreateSuccess() {
 		Background:   t.Pet.Background,
 		Address:      t.Pet.Address,
 		Contact:      t.Pet.Contact,
-		AdoptBy:      t.Pet.AdoptBy,
 	}
 
 	repo.On("Create", in).Return(t.Pet, nil)
@@ -432,7 +426,6 @@ func (t *PetServiceTest) TestCreateInternalErr() {
 		Background:   t.Pet.Background,
 		Address:      t.Pet.Address,
 		Contact:      t.Pet.Contact,
-		AdoptBy:      t.Pet.AdoptBy,
 	}
 
 	repo.On("Create", in).Return(nil, errors.New("something wrong"))
