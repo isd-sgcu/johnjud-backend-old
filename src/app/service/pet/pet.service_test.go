@@ -3,7 +3,6 @@ package pet
 import (
 	"context"
 	"errors"
-	"fmt"
 	"math/rand"
 	"testing"
 	"time"
@@ -76,7 +75,7 @@ func (t *PetServiceTest) SetupTest() {
 		var images []*img_proto.Image
 		var imageUrls []string
 		for i := 0; i < 3; i++ {
-			url := fmt.Sprintf("http://www.image.pet.%v", i)
+			url := faker.URL()
 			images = append(images, &img_proto.Image{
 				Id:       faker.UUIDDigit(),
 				PetId:    pet.ID.String(),
@@ -319,7 +318,6 @@ func (t *PetServiceTest) TestFindAllSuccess() {
 	imgSrv := new(img_mock.ServiceMock)
 	for i, pet := range t.Pets {
 		imgSrv.On("FindByPetId", pet.ID.String()).Return(t.ImagesList[i], nil)
-		fmt.Println(len(t.ImageUrlsList[i]))
 	}
 
 	srv := NewService(repo, imgSrv)
@@ -517,6 +515,7 @@ func (t *PetServiceTest) TestChangeViewSuccess() {
 	repo.On("FindOne", t.Pet.ID.String(), &pet.Pet{}).Return(t.Pet, nil)
 	repo.On("Update", t.Pet.ID.String(), t.ChangeViewPet).Return(t.ChangeViewPet, nil)
 	imgSrv := new(img_mock.ServiceMock)
+	imgSrv.On("FindByPetId", t.Pet.ID.String()).Return(t.Images, nil)
 
 	srv := NewService(repo, imgSrv)
 	actual, err := srv.ChangeView(context.Background(), t.ChangeViewPetReqMock)
