@@ -38,6 +38,8 @@ type PetServiceTest struct {
 	ChangeViewPetReqMock *proto.ChangeViewPetRequest
 	Images               []*img_proto.Image
 	ImageUrls            []string
+	ChangeAdoptBy        *pet.Pet
+	AdoptByReq           *proto.AdoptPetRequest
 }
 
 func TestPetService(t *testing.T) {
@@ -67,6 +69,7 @@ func (t *PetServiceTest) SetupTest() {
 		Background:   faker.Paragraph(),
 		Address:      faker.Paragraph(),
 		Contact:      faker.Paragraph(),
+		AdoptBy:      "",
 	}
 
 	t.Images = []*img_proto.Image{
@@ -105,6 +108,7 @@ func (t *PetServiceTest) SetupTest() {
 		Address:      t.Pet.Address,
 		Contact:      t.Pet.Contact,
 		ImageUrls:    t.ImageUrls,
+		AdoptBy:      t.Pet.AdoptBy,
 	}
 
 	t.UpdatePet = &pet.Pet{
@@ -129,6 +133,7 @@ func (t *PetServiceTest) SetupTest() {
 		Background:   t.Pet.Background,
 		Address:      t.Pet.Address,
 		Contact:      t.Pet.Contact,
+		AdoptBy:      t.Pet.AdoptBy,
 	}
 
 	t.ChangeViewPet = &pet.Pet{
@@ -153,6 +158,7 @@ func (t *PetServiceTest) SetupTest() {
 		Background:   t.Pet.Background,
 		Address:      t.Pet.Address,
 		Contact:      t.Pet.Contact,
+		AdoptBy:      t.Pet.AdoptBy,
 	}
 
 	t.CreatePetReqMock = &proto.CreatePetRequest{
@@ -173,6 +179,7 @@ func (t *PetServiceTest) SetupTest() {
 			Background:   t.Pet.Background,
 			Address:      t.Pet.Address,
 			Contact:      t.Pet.Contact,
+			AdoptBy:      t.Pet.AdoptBy,
 		},
 	}
 
@@ -195,12 +202,43 @@ func (t *PetServiceTest) SetupTest() {
 			Background:   t.Pet.Background,
 			Address:      t.Pet.Address,
 			Contact:      t.Pet.Contact,
+			AdoptBy:      t.Pet.AdoptBy,
 		},
 	}
 
 	t.ChangeViewPetReqMock = &proto.ChangeViewPetRequest{
 		Id:      t.Pet.ID.String(),
 		Visible: false,
+	}
+
+	t.ChangeAdoptBy = &pet.Pet{
+		Base: model.Base{
+			ID:        t.Pet.Base.ID,
+			CreatedAt: t.Pet.Base.CreatedAt,
+			UpdatedAt: t.Pet.Base.UpdatedAt,
+			DeletedAt: t.Pet.Base.DeletedAt,
+		},
+		Type:         t.Pet.Type,
+		Species:      t.Pet.Species,
+		Name:         t.Pet.Name,
+		Birthdate:    t.Pet.Birthdate,
+		Gender:       t.Pet.Gender,
+		Habit:        t.Pet.Habit,
+		Caption:      t.Pet.Caption,
+		Status:       t.Pet.Status,
+		IsSterile:    t.Pet.IsSterile,
+		IsVaccinated: t.Pet.IsVaccinated,
+		IsVisible:    t.Pet.IsVisible,
+		IsClubPet:    t.Pet.IsClubPet,
+		Background:   t.Pet.Background,
+		Address:      t.Pet.Address,
+		Contact:      t.Pet.Contact,
+		AdoptBy:      faker.UUIDDigit(),
+	}
+
+	t.AdoptByReq = &proto.AdoptPetRequest{
+		PetId:  t.ChangeAdoptBy.ID.String(),
+		UserId: t.ChangeAdoptBy.AdoptBy,
 	}
 }
 func (t *PetServiceTest) TestDeleteSuccess() {
@@ -361,6 +399,7 @@ func (t *PetServiceTest) TestCreateSuccess() {
 		Background:   t.Pet.Background,
 		Address:      t.Pet.Address,
 		Contact:      t.Pet.Contact,
+		AdoptBy:      t.Pet.AdoptBy,
 	}
 
 	repo.On("Create", in).Return(t.Pet, nil)
@@ -393,6 +432,7 @@ func (t *PetServiceTest) TestCreateInternalErr() {
 		Background:   t.Pet.Background,
 		Address:      t.Pet.Address,
 		Contact:      t.Pet.Contact,
+		AdoptBy:      t.Pet.AdoptBy,
 	}
 
 	repo.On("Create", in).Return(nil, errors.New("something wrong"))
@@ -469,4 +509,55 @@ func (t *PetServiceTest) TestChangeViewNotFound() {
 	assert.True(t.T(), ok)
 	assert.Nil(t.T(), actual)
 	assert.Equal(t.T(), codes.NotFound, st.Code())
+}
+
+func (t *PetServiceTest) TestAdoptBySuccess() {
+	want := &proto.AdoptPetResponse{Success: true}
+	repo := &mock.RepositoryMock{}
+
+	repo.On("FindOne", t.AdoptByReq.PetId, &pet.Pet{}).Return(t.Pet, nil)
+	repo.On("Update", t.AdoptByReq.PetId, t.ChangeAdoptBy).Return(t.ChangeAdoptBy, nil)
+
+	imgSrv := new(img_mock.ServiceMock)
+	srv := NewService(repo, imgSrv)
+
+	actual, err := srv.AdoptPet(context.Background(), t.AdoptByReq)
+
+	assert.Nil(t.T(), err)
+	assert.Equal(t.T(), want, actual)
+}
+
+func (t *PetServiceTest) TestAdoptByPetNotFound() {
+	wantError := status.Error(codes.NotFound, "pet not found")
+	repo := &mock.RepositoryMock{}
+
+	repo.On("FindOne", t.AdoptByReq.PetId, &pet.Pet{}).Return(nil, wantError)
+
+	imgSrv := new(img_mock.ServiceMock)
+	srv := NewService(repo, imgSrv)
+
+	actual, err := srv.AdoptPet(context.Background(), t.AdoptByReq)
+
+	assert.NotNil(t.T(), err)
+	assert.Equal(t.T(), wantError, err)
+	assert.Nil(t.T(), actual)
+
+	repo.AssertNotCalled(t.T(), "Update", t.AdoptByReq.PetId, t.ChangeAdoptBy)
+}
+
+func (t *PetServiceTest) TestAdoptByUpdateError() {
+	wantError := status.Error(codes.NotFound, "pet not found")
+	repo := &mock.RepositoryMock{}
+
+	repo.On("FindOne", t.AdoptByReq.PetId, &pet.Pet{}).Return(t.Pet, nil)
+	repo.On("Update", t.AdoptByReq.PetId, t.ChangeAdoptBy).Return(nil, errors.New("update error"))
+
+	imgSrv := new(img_mock.ServiceMock)
+	srv := NewService(repo, imgSrv)
+
+	actual, err := srv.AdoptPet(context.Background(), t.AdoptByReq)
+
+	assert.NotNil(t.T(), err)
+	assert.Equal(t.T(), wantError, err)
+	assert.Nil(t.T(), actual)
 }
