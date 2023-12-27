@@ -8,3 +8,6 @@ database:
   name: johnjud_db
   username: root
   password: root
+
+service: 
+  file: localhost:3003
