@@ -97,25 +97,6 @@ func (t *PetServiceTest) SetupTest() {
 		}
 	}
 
-	// for _, image := t.ImagesList
-
-	// t.Images = []*img_proto.Image{
-	// 	{
-	// 		Id:       faker.UUIDDigit(),
-	// 		PetId:    t.Pet.ID.String(),
-	// 		ImageUrl: faker.URL(),
-	// 	},
-	// 	{
-	// 		Id:       faker.UUIDDigit(),
-	// 		PetId:    t.Pet.ID.String(),
-	// 		ImageUrl: faker.URL(),
-	// 	},
-	// }
-
-	// t.ImageUrls = []string{
-	// 	t.Images[0].ImageUrl,
-	// 	t.Images[1].ImageUrl,
-	// }
 	t.Images = t.ImagesList[0]
 	t.ImageUrls = t.ImageUrlsList[0]
 
