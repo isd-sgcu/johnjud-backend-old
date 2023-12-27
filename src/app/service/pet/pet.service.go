@@ -19,6 +19,7 @@ import (
 )
 
 type Service struct {
+	proto.UnimplementedPetServiceServer
 	repository   IRepository
 	imageService ImageService
 }
@@ -36,7 +37,7 @@ type ImageService interface {
 }
 
 func NewService(repository IRepository, imageService ImageService) *Service {
-	return &Service{repository, imageService}
+	return &Service{repository: repository, imageService: imageService}
 }
 
 func (s *Service) Delete(ctx context.Context, req *proto.DeletePetRequest) (*proto.DeletePetResponse, error) {
