@@ -91,13 +91,29 @@ func (s *Service) ChangeView(_ context.Context, req *proto.ChangeViewPetRequest)
 
 func (s *Service) FindAll(_ context.Context, req *proto.FindAllPetRequest) (res *proto.FindAllPetResponse, err error) {
 	var pets []*pet.Pet
+	var imageUrlsList [][]string
 
 	err = s.repository.FindAll(&pets)
 	if err != nil {
 		log.Error().Err(err).Str("service", "event").Str("module", "find all").Msg("Error while querying all events")
 		return nil, status.Error(codes.Unavailable, "Internal error")
 	}
-	return &proto.FindAllPetResponse{Pets: RawToDtoList(&pets)}, nil
+
+	for _, pet := range pets {
+		images, err := s.imageService.FindByPetId(pet.ID.String())
+		if err != nil {
+			return nil, status.Error(codes.Internal, "error querying image service")
+		}
+		imageUrls := ExtractImageUrls(images)
+		imageUrlsList = append(imageUrlsList, imageUrls)
+	}
+
+	petWithImageUrls, err := RawToDtoList(&pets, imageUrlsList)
+	if err != nil {
+		return nil, status.Error(codes.Internal, "error converting raw to dto list")
+	}
+
+	return &proto.FindAllPetResponse{Pets: petWithImageUrls}, nil
 }
 
 func (s Service) FindOne(_ context.Context, req *proto.FindOnePetRequest) (res *proto.FindOnePetResponse, err error) {
@@ -109,7 +125,14 @@ func (s Service) FindOne(_ context.Context, req *proto.FindOnePetRequest) (res *
 			Str("service", "pet").Str("module", "find one").Str("id", req.Id).Msg("Not found")
 		return nil, status.Error(codes.NotFound, err.Error())
 	}
-	return &proto.FindOnePetResponse{Pet: RawToDto(&pet, []string{})}, err
+
+	images, err := s.imageService.FindByPetId(req.Id)
+	if err != nil {
+		return nil, status.Error(codes.Internal, "error querying image service")
+	}
+	imageUrls := ExtractImageUrls(images)
+
+	return &proto.FindOnePetResponse{Pet: RawToDto(&pet, imageUrls)}, err
 }
 
 func (s *Service) Create(_ context.Context, req *proto.CreatePetRequest) (res *proto.CreatePetResponse, err error) {
@@ -128,12 +151,16 @@ func (s *Service) Create(_ context.Context, req *proto.CreatePetRequest) (res *p
 	return &proto.CreatePetResponse{Pet: RawToDto(raw, imgUrls)}, nil
 }
 
-func RawToDtoList(in *[]*pet.Pet) []*proto.Pet {
+func RawToDtoList(in *[]*pet.Pet, imageUrls [][]string) ([]*proto.Pet, error) {
 	var result []*proto.Pet
-	for _, e := range *in {
-		result = append(result, RawToDto(e, []string{}))
+	if len(*in) != len(imageUrls) {
+		return nil, errors.New("length of in and imageUrls have to be the same")
 	}
-	return result
+
+	for i, e := range *in {
+		result = append(result, RawToDto(e, imageUrls[i]))
+	}
+	return result, nil
 }
 
 func RawToDto(in *pet.Pet, imgUrl []string) *proto.Pet {

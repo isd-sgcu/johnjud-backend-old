@@ -38,6 +38,8 @@ type PetServiceTest struct {
 	ChangeViewPetReqMock *proto.ChangeViewPetRequest
 	Images               []*img_proto.Image
 	ImageUrls            []string
+	ImagesList           [][]*img_proto.Image
+	ImageUrlsList        [][]string
 }
 
 func TestPetService(t *testing.T) {
@@ -45,47 +47,58 @@ func TestPetService(t *testing.T) {
 }
 
 func (t *PetServiceTest) SetupTest() {
-	t.Pet = &pet.Pet{
-		Base: model.Base{
-			ID:        uuid.New(),
-			CreatedAt: time.Time{},
-			UpdatedAt: time.Time{},
-			DeletedAt: gorm.DeletedAt{},
-		},
-		Type:         faker.Word(),
-		Species:      faker.Word(),
-		Name:         faker.Name(),
-		Birthdate:    faker.Word(),
-		Gender:       petConst.Gender(rand.Intn(1) + 1),
-		Habit:        faker.Paragraph(),
-		Caption:      faker.Paragraph(),
-		Status:       petConst.Status(rand.Intn(1) + 1),
-		IsSterile:    true,
-		IsVaccinated: true,
-		IsVisible:    true,
-		IsClubPet:    true,
-		Background:   faker.Paragraph(),
-		Address:      faker.Paragraph(),
-		Contact:      faker.Paragraph(),
+	var pets []*pet.Pet
+	for i := 0; i <= 3; i++ {
+		pet := &pet.Pet{
+			Base: model.Base{
+				ID:        uuid.New(),
+				CreatedAt: time.Time{},
+				UpdatedAt: time.Time{},
+				DeletedAt: gorm.DeletedAt{},
+			},
+			Type:         faker.Word(),
+			Species:      faker.Word(),
+			Name:         faker.Name(),
+			Birthdate:    faker.Word(),
+			Gender:       petConst.Gender(rand.Intn(1) + 1),
+			Habit:        faker.Paragraph(),
+			Caption:      faker.Paragraph(),
+			Status:       petConst.Status(rand.Intn(1) + 1),
+			IsSterile:    true,
+			IsVaccinated: true,
+			IsVisible:    true,
+			IsClubPet:    true,
+			Background:   faker.Paragraph(),
+			Address:      faker.Paragraph(),
+			Contact:      faker.Paragraph(),
+		}
+		var images []*img_proto.Image
+		var imageUrls []string
+		for i := 0; i < 3; i++ {
+			url := faker.URL()
+			images = append(images, &img_proto.Image{
+				Id:       faker.UUIDDigit(),
+				PetId:    pet.ID.String(),
+				ImageUrl: url,
+			})
+			imageUrls = append(imageUrls, url)
+		}
+		t.ImagesList = append(t.ImagesList, images)
+		t.ImageUrlsList = append(t.ImageUrlsList, imageUrls)
+		pets = append(pets, pet)
 	}
 
-	t.Images = []*img_proto.Image{
-		{
-			Id:       faker.UUIDDigit(),
-			PetId:    t.Pet.ID.String(),
-			ImageUrl: faker.URL(),
-		},
-		{
-			Id:       faker.UUIDDigit(),
-			PetId:    t.Pet.ID.String(),
-			ImageUrl: faker.URL(),
-		},
+	t.Pets = pets
+	t.Pet = pets[0]
+
+	for _, images := range t.ImagesList {
+		for _, image := range images {
+			t.ImageUrls = append(t.ImageUrls, image.ImageUrl)
+		}
 	}
 
-	t.ImageUrls = []string{
-		t.Images[0].ImageUrl,
-		t.Images[1].ImageUrl,
-	}
+	t.Images = t.ImagesList[0]
+	t.ImageUrls = t.ImageUrlsList[0]
 
 	t.PetDto = &proto.Pet{
 		Id:           t.Pet.ID.String(),
@@ -202,6 +215,7 @@ func (t *PetServiceTest) SetupTest() {
 		Id:      t.Pet.ID.String(),
 		Visible: false,
 	}
+
 }
 func (t *PetServiceTest) TestDeleteSuccess() {
 	want := &proto.DeletePetResponse{Success: true}
@@ -259,8 +273,6 @@ func (t *PetServiceTest) TestDeleteWithUnexpectedError() {
 }
 
 func (t *PetServiceTest) TestFindOneSuccess() {
-	t.PetDto.ImageUrls = []string{}
-
 	want := &proto.FindOnePetResponse{Pet: t.PetDto}
 
 	repo := &mock.RepositoryMock{}
@@ -276,14 +288,18 @@ func (t *PetServiceTest) TestFindOneSuccess() {
 }
 
 func (t *PetServiceTest) TestFindAllSuccess() {
-	var pets []*pet.Pet
 
-	want := &proto.FindAllPetResponse{Pets: createPetsDto(t.Pets)}
+	want := &proto.FindAllPetResponse{Pets: t.createPetsDto(t.Pets, t.ImageUrlsList)}
+
+	var petsIn []*pet.Pet
 
 	repo := &mock.RepositoryMock{}
-	repo.On("FindAll", pets).Return(&t.Pets, nil)
+	repo.On("FindAll", petsIn).Return(&t.Pets, nil)
+
 	imgSrv := new(img_mock.ServiceMock)
-	imgSrv.On("FindByPetId", t.Pet.ID.String()).Return(t.Images, nil)
+	for i, pet := range t.Pets {
+		imgSrv.On("FindByPetId", pet.ID.String()).Return(t.ImagesList[i], nil)
+	}
 
 	srv := NewService(repo, imgSrv)
 
@@ -309,10 +325,43 @@ func (t *PetServiceTest) TestFindOneNotFound() {
 	assert.Equal(t.T(), codes.NotFound, st.Code())
 }
 
-func createPetsDto(in []*pet.Pet) []*proto.Pet {
+func createPets() []*pet.Pet {
+	var result []*pet.Pet
+
+	for i := 0; i < rand.Intn(4)+1; i++ {
+		r := &pet.Pet{
+			Base: model.Base{
+				ID:        uuid.New(),
+				CreatedAt: time.Time{},
+				UpdatedAt: time.Time{},
+				DeletedAt: gorm.DeletedAt{},
+			},
+			Type:         faker.Word(),
+			Species:      faker.Word(),
+			Name:         faker.Name(),
+			Birthdate:    faker.Word(),
+			Gender:       petConst.Gender(rand.Intn(1) + 1),
+			Habit:        faker.Paragraph(),
+			Caption:      faker.Paragraph(),
+			Status:       petConst.Status(rand.Intn(1) + 1),
+			IsSterile:    true,
+			IsVaccinated: true,
+			IsVisible:    true,
+			IsClubPet:    true,
+			Background:   faker.Paragraph(),
+			Address:      faker.Paragraph(),
+			Contact:      faker.Paragraph(),
+		}
+		result = append(result, r)
+	}
+
+	return result
+}
+
+func (t *PetServiceTest) createPetsDto(in []*pet.Pet, imageUrlsList [][]string) []*proto.Pet {
 	var result []*proto.Pet
 
-	for _, p := range in {
+	for i, p := range in {
 		r := &proto.Pet{
 			Id:           p.ID.String(),
 			Type:         p.Type,
@@ -322,8 +371,8 @@ func createPetsDto(in []*pet.Pet) []*proto.Pet {
 			Gender:       proto.Gender(p.Gender),
 			Habit:        p.Habit,
 			Caption:      p.Caption,
-			Status:       0,
-			ImageUrls:    []string{},
+			Status:       proto.PetStatus(p.Status),
+			ImageUrls:    imageUrlsList[i],
 			IsSterile:    p.IsSterile,
 			IsVaccinated: p.IsVaccinated,
 			IsVisible:    p.IsVisible,
@@ -447,6 +496,7 @@ func (t *PetServiceTest) TestChangeViewSuccess() {
 	repo.On("FindOne", t.Pet.ID.String(), &pet.Pet{}).Return(t.Pet, nil)
 	repo.On("Update", t.Pet.ID.String(), t.ChangeViewPet).Return(t.ChangeViewPet, nil)
 	imgSrv := new(img_mock.ServiceMock)
+	imgSrv.On("FindByPetId", t.Pet.ID.String()).Return(t.Images, nil)
 
 	srv := NewService(repo, imgSrv)
 	actual, err := srv.ChangeView(context.Background(), t.ChangeViewPetReqMock)
