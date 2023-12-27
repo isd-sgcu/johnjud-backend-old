@@ -10,4 +10,4 @@ database:
   password: root
 
 service: 
-  file: localhost:3003
+  file: localhost:3004
