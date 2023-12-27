@@ -139,7 +139,7 @@ func (s Service) FindOne(_ context.Context, req *proto.FindOnePetRequest) (res *
 func (s *Service) Create(_ context.Context, req *proto.CreatePetRequest) (res *proto.CreatePetResponse, err error) {
 	raw, err := DtoToRaw(req.Pet)
 	if err != nil {
-		return nil, status.Error(codes.Internal, "error converting dto to raw")
+		return nil, status.Error(codes.Internal, "error converting dto to raw: "+err.Error())
 	}
 
 	imgUrls := []string{}
@@ -183,6 +183,7 @@ func RawToDto(in *pet.Pet, imgUrl []string) *proto.Pet {
 		Background:   in.Background,
 		Address:      in.Address,
 		Contact:      in.Contact,
+		AdoptBy:      in.AdoptBy,
 	}
 }
 
@@ -234,6 +235,7 @@ func DtoToRaw(in *proto.Pet) (res *pet.Pet, err error) {
 		Background:   in.Background,
 		Address:      in.Address,
 		Contact:      in.Contact,
+		AdoptBy:      in.AdoptBy,
 	}, nil
 }
 
