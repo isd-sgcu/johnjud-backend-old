@@ -53,3 +53,13 @@ func (r *RepositoryMock) Delete(id string) error {
 	args := r.Called(id)
 	return args.Error(0)
 }
+
+func (r *RepositoryMock) ChangeView(id string, visible bool, result *bool) error {
+	args := r.Called(id, result)
+
+	if args.Get(0) != nil {
+		*result = args.Get(0).(bool)
+	}
+
+	return args.Error(1)
+}
