@@ -38,10 +38,10 @@ type PetServiceTest struct {
 	ChangeViewPetReqMock *proto.ChangeViewPetRequest
 	Images               []*img_proto.Image
 	ImageUrls            []string
-	ChangeAdoptBy        *pet.Pet
-	AdoptByReq           *proto.AdoptPetRequest
 	ImagesList           [][]*img_proto.Image
 	ImageUrlsList        [][]string
+	ChangeAdoptBy        *pet.Pet
+	AdoptByReq           *proto.AdoptPetRequest
 }
 
 func TestPetService(t *testing.T) {
@@ -562,6 +562,8 @@ func (t *PetServiceTest) TestAdoptBySuccess() {
 	repo.On("Update", t.AdoptByReq.PetId, t.ChangeAdoptBy).Return(t.ChangeAdoptBy, nil)
 
 	imgSrv := new(img_mock.ServiceMock)
+	imgSrv.On("FindByPetId", t.Pet.ID.String()).Return(t.Images, nil)
+
 	srv := NewService(repo, imgSrv)
 
 	actual, err := srv.AdoptPet(context.Background(), t.AdoptByReq)
@@ -596,6 +598,8 @@ func (t *PetServiceTest) TestAdoptByUpdateError() {
 	repo.On("Update", t.AdoptByReq.PetId, t.ChangeAdoptBy).Return(nil, errors.New("update error"))
 
 	imgSrv := new(img_mock.ServiceMock)
+	imgSrv.On("FindByPetId", t.Pet.ID.String()).Return(nil, errors.New("pet not found"))
+
 	srv := NewService(repo, imgSrv)
 
 	actual, err := srv.AdoptPet(context.Background(), t.AdoptByReq)

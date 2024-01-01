@@ -171,25 +171,6 @@ func (s *Service) AdoptPet(ctx context.Context, req *proto.AdoptPetRequest) (res
 	return &proto.AdoptPetResponse{Success: true}, nil
 }
 
-func (s *Service) AdoptPet(ctx context.Context, req *proto.AdoptPetRequest) (res *proto.AdoptPetResponse, err error) {
-	dtoPet, err := s.FindOne(context.Background(), &proto.FindOnePetRequest{Id: req.PetId})
-	if err != nil {
-		return nil, status.Error(codes.NotFound, "pet not found")
-	}
-	pet, err := DtoToRaw(dtoPet.Pet)
-	if err != nil {
-		return nil, status.Error(codes.Internal, "error converting dto to raw")
-	}
-	pet.AdoptBy = req.UserId
-
-	err = s.repository.Update(req.PetId, pet)
-	if err != nil {
-		return nil, status.Error(codes.NotFound, "pet not found")
-	}
-
-	return &proto.AdoptPetResponse{Success: true}, nil
-}
-
 func RawToDtoList(in *[]*pet.Pet, imageUrls [][]string) ([]*proto.Pet, error) {
 	var result []*proto.Pet
 	if len(*in) != len(imageUrls) {
