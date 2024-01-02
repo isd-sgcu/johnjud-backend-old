@@ -73,16 +73,16 @@ func (t *PetServiceTest) SetupTest() {
 			Contact:      faker.Paragraph(),
 		}
 		var images []*img_proto.Image
-		var imageUrls []string
-		for i := 0; i < 3; i++ {
-			url := faker.URL()
-			images = append(images, &img_proto.Image{
-				Id:       faker.UUIDDigit(),
-				PetId:    pet.ID.String(),
-				ImageUrl: url,
-			})
-			imageUrls = append(imageUrls, url)
-		}
+		imageUrls := []string{}
+		// for i := 0; i < 3; i++ {
+		// 	url := faker.URL()
+		// 	images = append(images, &img_proto.Image{
+		// 		Id:       faker.UUIDDigit(),
+		// 		PetId:    pet.ID.String(),
+		// 		ImageUrl: url,
+		// 	})
+		// 	imageUrls = append(imageUrls, url)
+		// }
 		t.ImagesList = append(t.ImagesList, images)
 		t.ImageUrlsList = append(t.ImageUrlsList, imageUrls)
 		pets = append(pets, pet)

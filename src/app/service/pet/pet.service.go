@@ -92,7 +92,6 @@ func (s *Service) ChangeView(_ context.Context, req *proto.ChangeViewPetRequest)
 
 func (s *Service) FindAll(_ context.Context, req *proto.FindAllPetRequest) (res *proto.FindAllPetResponse, err error) {
 	var pets []*pet.Pet
-	var imageUrlsList [][]string
 
 	err = s.repository.FindAll(&pets)
 	if err != nil {
@@ -100,6 +99,7 @@ func (s *Service) FindAll(_ context.Context, req *proto.FindAllPetRequest) (res 
 		return nil, status.Error(codes.Unavailable, "Internal error")
 	}
 
+	imageUrlsList := make([][]string, len(pets))
 	// for _, pet := range pets {
 	// 	images, err := s.imageService.FindByPetId(pet.ID.String())
 	// 	if err != nil {
