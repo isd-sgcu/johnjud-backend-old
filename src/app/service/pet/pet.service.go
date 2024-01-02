@@ -62,13 +62,13 @@ func (s *Service) Update(_ context.Context, req *proto.UpdatePetRequest) (res *p
 		return nil, status.Error(codes.NotFound, "pet not found")
 	}
 
-	images, err := s.imageService.FindByPetId(req.Pet.Id)
-	if err != nil {
-		return nil, status.Error(codes.Internal, "error querying image service")
-	}
-	imageUrls := ExtractImageUrls(images)
+	// images, err := s.imageService.FindByPetId(req.Pet.Id)
+	// if err != nil {
+	// 	return nil, status.Error(codes.Internal, "error querying image service")
+	// }
+	// imageUrls := ExtractImageUrls(images)
 
-	return &proto.UpdatePetResponse{Pet: RawToDto(raw, imageUrls)}, nil
+	return &proto.UpdatePetResponse{Pet: RawToDto(raw, []string{})}, nil
 }
 
 func (s *Service) ChangeView(_ context.Context, req *proto.ChangeViewPetRequest) (res *proto.ChangeViewPetResponse, err error) {
@@ -100,14 +100,14 @@ func (s *Service) FindAll(_ context.Context, req *proto.FindAllPetRequest) (res 
 		return nil, status.Error(codes.Unavailable, "Internal error")
 	}
 
-	for _, pet := range pets {
-		images, err := s.imageService.FindByPetId(pet.ID.String())
-		if err != nil {
-			return nil, status.Error(codes.Internal, "error querying image service")
-		}
-		imageUrls := ExtractImageUrls(images)
-		imageUrlsList = append(imageUrlsList, imageUrls)
-	}
+	// for _, pet := range pets {
+	// 	images, err := s.imageService.FindByPetId(pet.ID.String())
+	// 	if err != nil {
+	// 		return nil, status.Error(codes.Internal, "error querying image service")
+	// 	}
+	// 	imageUrls := ExtractImageUrls(images)
+	// 	imageUrlsList = append(imageUrlsList, imageUrls)
+	// }
 
 	petWithImageUrls, err := RawToDtoList(&pets, imageUrlsList)
 	if err != nil {
@@ -127,13 +127,13 @@ func (s Service) FindOne(_ context.Context, req *proto.FindOnePetRequest) (res *
 		return nil, status.Error(codes.NotFound, err.Error())
 	}
 
-	images, err := s.imageService.FindByPetId(req.Id)
-	if err != nil {
-		return nil, status.Error(codes.Internal, "error querying image service")
-	}
-	imageUrls := ExtractImageUrls(images)
+	// images, err := s.imageService.FindByPetId(req.Id)
+	// if err != nil {
+	// 	return nil, status.Error(codes.Internal, "error querying image service")
+	// }
+	// imageUrls := ExtractImageUrls(images)
 
-	return &proto.FindOnePetResponse{Pet: RawToDto(&pet, imageUrls)}, err
+	return &proto.FindOnePetResponse{Pet: RawToDto(&pet, []string{})}, err
 }
 
 func (s *Service) Create(_ context.Context, req *proto.CreatePetRequest) (res *proto.CreatePetResponse, err error) {
@@ -174,11 +174,12 @@ func (s *Service) AdoptPet(ctx context.Context, req *proto.AdoptPetRequest) (res
 func RawToDtoList(in *[]*pet.Pet, imageUrls [][]string) ([]*proto.Pet, error) {
 	var result []*proto.Pet
 	if len(*in) != len(imageUrls) {
-		return nil, errors.New("length of in and imageUrls have to be the same")
+		return nil, status.Error(codes.Internal, "length of in and imageUrls have to be the same")
 	}
 
-	for i, e := range *in {
-		result = append(result, RawToDto(e, imageUrls[i]))
+	for _, e := range *in {
+		// result = append(result, RawToDto(e, imageUrls[i]))
+		result = append(result, RawToDto(e, []string{}))
 	}
 	return result, nil
 }
