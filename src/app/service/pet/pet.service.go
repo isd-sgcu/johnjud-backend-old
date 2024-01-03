@@ -54,7 +54,7 @@ func (s *Service) Delete(ctx context.Context, req *proto.DeletePetRequest) (*pro
 func (s *Service) Update(_ context.Context, req *proto.UpdatePetRequest) (res *proto.UpdatePetResponse, err error) {
 	raw, err := DtoToRaw(req.Pet)
 	if err != nil {
-		return nil, status.Error(codes.Internal, "error converting dto to raw")
+		return nil, status.Error(codes.InvalidArgument, "error converting dto to raw")
 	}
 
 	err = s.repository.Update(req.Pet.Id, raw)
@@ -67,7 +67,6 @@ func (s *Service) Update(_ context.Context, req *proto.UpdatePetRequest) (res *p
 	// 	return nil, status.Error(codes.Internal, "error querying image service")
 	// }
 	// imageUrls := ExtractImageUrls(images)
-
 	return &proto.UpdatePetResponse{Pet: RawToDto(raw, []string{})}, nil
 }
 
@@ -78,9 +77,9 @@ func (s *Service) ChangeView(_ context.Context, req *proto.ChangeViewPetRequest)
 	}
 	pet, err := DtoToRaw(petData.Pet)
 	if err != nil {
-		return nil, status.Error(codes.Internal, "error converting dto to raw")
+		return nil, status.Error(codes.InvalidArgument, "error converting dto to raw")
 	}
-	pet.IsVisible = req.Visible
+	pet.IsVisible = &req.Visible
 
 	err = s.repository.Update(req.Id, pet)
 	if err != nil {
@@ -111,7 +110,7 @@ func (s *Service) FindAll(_ context.Context, req *proto.FindAllPetRequest) (res 
 
 	petWithImageUrls, err := RawToDtoList(&pets, imageUrlsList)
 	if err != nil {
-		return nil, status.Error(codes.Internal, "error converting raw to dto list")
+		return nil, status.Error(codes.InvalidArgument, "error converting raw to dto list")
 	}
 
 	return &proto.FindAllPetResponse{Pets: petWithImageUrls}, nil
@@ -139,14 +138,14 @@ func (s Service) FindOne(_ context.Context, req *proto.FindOnePetRequest) (res *
 func (s *Service) Create(_ context.Context, req *proto.CreatePetRequest) (res *proto.CreatePetResponse, err error) {
 	raw, err := DtoToRaw(req.Pet)
 	if err != nil {
-		return nil, status.Error(codes.Internal, "error converting dto to raw: "+err.Error())
+		return nil, status.Error(codes.InvalidArgument, "error converting dto to raw: "+err.Error())
 	}
 
 	imgUrls := []string{}
 
 	err = s.repository.Create(raw)
 	if err != nil {
-		return nil, status.Error(codes.Internal, "failed to create pet")
+		return nil, status.Error(codes.InvalidArgument, "failed to create pet")
 	}
 
 	return &proto.CreatePetResponse{Pet: RawToDto(raw, imgUrls)}, nil
@@ -174,7 +173,7 @@ func (s *Service) AdoptPet(ctx context.Context, req *proto.AdoptPetRequest) (res
 func RawToDtoList(in *[]*pet.Pet, imageUrls [][]string) ([]*proto.Pet, error) {
 	var result []*proto.Pet
 	if len(*in) != len(imageUrls) {
-		return nil, status.Error(codes.Internal, "length of in and imageUrls have to be the same")
+		return nil, status.Error(codes.InvalidArgument, "length of in and imageUrls have to be the same")
 	}
 
 	for _, e := range *in {
@@ -196,10 +195,10 @@ func RawToDto(in *pet.Pet, imgUrl []string) *proto.Pet {
 		Caption:      in.Caption,
 		Status:       proto.PetStatus(in.Status),
 		ImageUrls:    imgUrl,
-		IsSterile:    in.IsSterile,
-		IsVaccinated: in.IsVaccinated,
-		IsVisible:    in.IsVisible,
-		IsClubPet:    in.IsClubPet,
+		IsSterile:    *in.IsSterile,
+		IsVaccinated: *in.IsVaccinated,
+		IsVisible:    *in.IsVisible,
+		IsClubPet:    *in.IsClubPet,
 		Background:   in.Background,
 		Address:      in.Address,
 		Contact:      in.Contact,
@@ -248,10 +247,10 @@ func DtoToRaw(in *proto.Pet) (res *pet.Pet, err error) {
 		Habit:        in.Habit,
 		Caption:      in.Caption,
 		Status:       status,
-		IsSterile:    in.IsSterile,
-		IsVaccinated: in.IsVaccinated,
-		IsVisible:    in.IsVisible,
-		IsClubPet:    in.IsClubPet,
+		IsSterile:    &in.IsSterile,
+		IsVaccinated: &in.IsVaccinated,
+		IsVisible:    &in.IsVisible,
+		IsClubPet:    &in.IsClubPet,
 		Background:   in.Background,
 		Address:      in.Address,
 		Contact:      in.Contact,
