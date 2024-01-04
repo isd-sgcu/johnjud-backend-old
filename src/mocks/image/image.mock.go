@@ -12,6 +12,16 @@ type ClientMock struct {
 	mock.Mock
 }
 
+func (c *ClientMock) AssignPet(_ context.Context, in *proto.AssignPetRequest, opts ...grpc.CallOption) (res *proto.AssignPetResponse, err error) {
+	args := c.Called(in)
+
+	if args.Get(0) != nil {
+		res = args.Get(0).(*proto.AssignPetResponse)
+	}
+
+	return res, args.Error(1)
+}
+
 func (c *ClientMock) Upload(_ context.Context, in *proto.UploadImageRequest, _ ...grpc.CallOption) (res *proto.UploadImageResponse, err error) {
 	args := c.Called(in)
 
