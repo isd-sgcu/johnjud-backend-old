@@ -121,7 +121,7 @@ func (t *PetServiceTest) SetupTest() {
 		Background:   t.Pet.Background,
 		Address:      t.Pet.Address,
 		Contact:      t.Pet.Contact,
-		ImageUrls:    t.ImageUrls,
+		Images:       nil,
 	}
 
 	t.UpdatePet = &pet.Pet{
@@ -182,7 +182,7 @@ func (t *PetServiceTest) SetupTest() {
 			Habit:        t.Pet.Habit,
 			Caption:      t.Pet.Caption,
 			Status:       proto.PetStatus(t.Pet.Status),
-			ImageUrls:    t.ImageUrls,
+			Images:       nil,
 			IsSterile:    *t.Pet.IsSterile,
 			IsVaccinated: *t.Pet.IsVaccinated,
 			IsVisible:    *t.Pet.IsVaccinated,
@@ -204,7 +204,7 @@ func (t *PetServiceTest) SetupTest() {
 			Habit:        t.Pet.Habit,
 			Caption:      t.Pet.Caption,
 			Status:       proto.PetStatus(t.Pet.Status),
-			ImageUrls:    t.ImageUrls,
+			Images:       nil,
 			IsSterile:    *t.Pet.IsSterile,
 			IsVaccinated: *t.Pet.IsVaccinated,
 			IsVisible:    *t.Pet.IsVisible,
@@ -323,7 +323,7 @@ func (t *PetServiceTest) TestFindOneSuccess() {
 
 func (t *PetServiceTest) TestFindAllSuccess() {
 
-	want := &proto.FindAllPetResponse{Pets: t.createPetsDto(t.Pets, t.ImageUrlsList)}
+	want := &proto.FindAllPetResponse{Pets: t.createPetsDto(t.Pets, t.ImagesList)}
 
 	var petsIn []*pet.Pet
 
@@ -392,7 +392,7 @@ func createPets() []*pet.Pet {
 	return result
 }
 
-func (t *PetServiceTest) createPetsDto(in []*pet.Pet, imageUrlsList [][]string) []*proto.Pet {
+func (t *PetServiceTest) createPetsDto(in []*pet.Pet, images [][]*img_proto.Image) []*proto.Pet {
 	var result []*proto.Pet
 
 	for i, p := range in {
@@ -406,7 +406,7 @@ func (t *PetServiceTest) createPetsDto(in []*pet.Pet, imageUrlsList [][]string) 
 			Habit:        p.Habit,
 			Caption:      p.Caption,
 			Status:       proto.PetStatus(p.Status),
-			ImageUrls:    imageUrlsList[i],
+			Images:       images[i],
 			IsSterile:    *p.IsSterile,
 			IsVaccinated: *p.IsVaccinated,
 			IsVisible:    *p.IsVisible,
@@ -424,7 +424,7 @@ func (t *PetServiceTest) createPetsDto(in []*pet.Pet, imageUrlsList [][]string) 
 
 func (t *PetServiceTest) TestCreateSuccess() {
 	want := &proto.CreatePetResponse{Pet: t.PetDto}
-	want.Pet.ImageUrls = []string{} // when pet is first created, it has no images
+	want.Pet.Images = nil // when pet is first created, it has no images
 
 	repo := &mock.RepositoryMock{}
 
