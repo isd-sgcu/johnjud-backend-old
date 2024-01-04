@@ -166,26 +166,40 @@ func RawToDtoList(in *[]*pet.Pet, imagesList [][]*image_proto.Image) ([]*proto.P
 }
 
 func RawToDto(in *pet.Pet, images []*image_proto.Image) *proto.Pet {
-	return &proto.Pet{
-		Id:           in.ID.String(),
-		Type:         in.Type,
-		Species:      in.Species,
-		Name:         in.Name,
-		Birthdate:    in.Birthdate,
-		Gender:       proto.Gender(in.Gender),
-		Habit:        in.Habit,
-		Caption:      in.Caption,
-		Status:       proto.PetStatus(in.Status),
-		Images:       images,
-		IsSterile:    *in.IsSterile,
-		IsVaccinated: *in.IsVaccinated,
-		IsVisible:    *in.IsVisible,
-		IsClubPet:    *in.IsClubPet,
-		Background:   in.Background,
-		Address:      in.Address,
-		Contact:      in.Contact,
-		AdoptBy:      in.AdoptBy,
+	pet := &proto.Pet{
+		Id:         in.ID.String(),
+		Type:       in.Type,
+		Species:    in.Species,
+		Name:       in.Name,
+		Birthdate:  in.Birthdate,
+		Gender:     proto.Gender(in.Gender),
+		Habit:      in.Habit,
+		Caption:    in.Caption,
+		Status:     proto.PetStatus(in.Status),
+		Images:     images,
+		Background: in.Background,
+		Address:    in.Address,
+		Contact:    in.Contact,
+		AdoptBy:    in.AdoptBy,
 	}
+
+	if in.IsClubPet != nil {
+		pet.IsClubPet = *in.IsClubPet
+	}
+
+	if in.IsSterile != nil {
+		pet.IsSterile = *in.IsSterile
+	}
+
+	if in.IsVaccinated != nil {
+		pet.IsVaccinated = *in.IsVaccinated
+	}
+
+	if in.IsVisible != nil {
+		pet.IsVisible = *in.IsVisible
+	}
+
+	return pet
 }
 
 func DtoToRaw(in *proto.Pet) (res *pet.Pet, err error) {
@@ -214,30 +228,44 @@ func DtoToRaw(in *proto.Pet) (res *pet.Pet, err error) {
 		status = petConst.FINDHOME
 	}
 
-	return &pet.Pet{
+	pet := &pet.Pet{
 		Base: model.Base{
 			ID:        id,
 			CreatedAt: time.Time{},
 			UpdatedAt: time.Time{},
 			DeletedAt: gorm.DeletedAt{},
 		},
-		Type:         in.Type,
-		Species:      in.Species,
-		Name:         in.Name,
-		Birthdate:    in.Birthdate,
-		Gender:       gender,
-		Habit:        in.Habit,
-		Caption:      in.Caption,
-		Status:       status,
-		IsSterile:    &in.IsSterile,
-		IsVaccinated: &in.IsVaccinated,
-		IsVisible:    &in.IsVisible,
-		IsClubPet:    &in.IsClubPet,
-		Background:   in.Background,
-		Address:      in.Address,
-		Contact:      in.Contact,
-		AdoptBy:      in.AdoptBy,
-	}, nil
+		Type:       in.Type,
+		Species:    in.Species,
+		Name:       in.Name,
+		Birthdate:  in.Birthdate,
+		Gender:     gender,
+		Habit:      in.Habit,
+		Caption:    in.Caption,
+		Status:     status,
+		Background: in.Background,
+		Address:    in.Address,
+		Contact:    in.Contact,
+		AdoptBy:    in.AdoptBy,
+	}
+
+	if &in.IsSterile != nil {
+		pet.IsSterile = &in.IsSterile
+	}
+
+	if &in.IsVaccinated != nil {
+		pet.IsVaccinated = &in.IsVaccinated
+	}
+
+	if &in.IsVisible != nil {
+		pet.IsVisible = &in.IsVisible
+	}
+
+	if &in.IsClubPet != nil {
+		pet.IsClubPet = &in.IsClubPet
+	}
+
+	return pet, nil
 }
 
 func ExtractImageUrls(in []*image_proto.Image) []string {
