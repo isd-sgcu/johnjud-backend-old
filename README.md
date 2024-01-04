@@ -9,7 +9,7 @@ Johnjud is a pet adoption web application of the [CUVET For Animal Welfare Club]
 
 -   golang
 -   gRPC
--   go-fiber
+-   postgresql
 
 ## Getting Started
 
