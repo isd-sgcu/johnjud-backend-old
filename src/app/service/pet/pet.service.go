@@ -156,7 +156,7 @@ func (s *Service) AdoptPet(ctx context.Context, req *proto.AdoptPetRequest) (res
 func RawToDtoList(in *[]*pet.Pet, imagesList [][]*image_proto.Image) ([]*proto.Pet, error) {
 	var result []*proto.Pet
 	if len(*in) != len(imagesList) {
-		return nil, status.Error(codes.InvalidArgument, "length of in and imageUrls have to be the same")
+		return nil, status.Error(codes.InvalidArgument, "length of in and imagesList have to be the same")
 	}
 
 	for i, e := range *in {
