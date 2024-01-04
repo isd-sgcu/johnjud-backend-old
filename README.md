@@ -22,7 +22,7 @@ Johnjud is a pet adoption web application of the [CUVET For Animal Welfare Club]
 ### Installation
 
 1. Clone this repo
-2. Copy `config.example.yaml` in `config` and paste it in the same directory with `.example` removed from its name.
+2. Copy every `config.example.yaml` in `config` and paste it in the same directory with `.example` removed from its name.
 
 3. Run `go mod download` to download all the dependencies.
 
