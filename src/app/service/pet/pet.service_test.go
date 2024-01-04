@@ -78,15 +78,6 @@ func (t *PetServiceTest) SetupTest() {
 		}
 		var images []*img_proto.Image
 		imageUrls := []string{}
-		// for i := 0; i < 3; i++ {
-		// 	url := faker.URL()
-		// 	images = append(images, &img_proto.Image{
-		// 		Id:       faker.UUIDDigit(),
-		// 		PetId:    pet.ID.String(),
-		// 		ImageUrl: url,
-		// 	})
-		// 	imageUrls = append(imageUrls, url)
-		// }
 		t.ImagesList = append(t.ImagesList, images)
 		t.ImageUrlsList = append(t.ImageUrlsList, imageUrls)
 		pets = append(pets, pet)
@@ -94,12 +85,6 @@ func (t *PetServiceTest) SetupTest() {
 
 	t.Pets = pets
 	t.Pet = pets[0]
-
-	for _, images := range t.ImagesList {
-		for _, image := range images {
-			t.ImageUrls = append(t.ImageUrls, image.ImageUrl)
-		}
-	}
 
 	t.Images = t.ImagesList[0]
 	t.ImageUrls = t.ImageUrlsList[0]
@@ -121,7 +106,7 @@ func (t *PetServiceTest) SetupTest() {
 		Background:   t.Pet.Background,
 		Address:      t.Pet.Address,
 		Contact:      t.Pet.Contact,
-		Images:       nil,
+		Images:       t.Images,
 	}
 
 	t.UpdatePet = &pet.Pet{
@@ -182,7 +167,7 @@ func (t *PetServiceTest) SetupTest() {
 			Habit:        t.Pet.Habit,
 			Caption:      t.Pet.Caption,
 			Status:       proto.PetStatus(t.Pet.Status),
-			Images:       nil,
+			Images:       t.Images,
 			IsSterile:    *t.Pet.IsSterile,
 			IsVaccinated: *t.Pet.IsVaccinated,
 			IsVisible:    *t.Pet.IsVaccinated,
@@ -204,7 +189,7 @@ func (t *PetServiceTest) SetupTest() {
 			Habit:        t.Pet.Habit,
 			Caption:      t.Pet.Caption,
 			Status:       proto.PetStatus(t.Pet.Status),
-			Images:       nil,
+			Images:       t.Images,
 			IsSterile:    *t.Pet.IsSterile,
 			IsVaccinated: *t.Pet.IsVaccinated,
 			IsVisible:    *t.Pet.IsVisible,
