@@ -1,6 +1,17 @@
 version: "3.9"
 
 services:
+  local-file:
+    image: ghcr.io/isd-sgcu/johnjud-file
+    container_name: file
+    depends_on:
+      - local-db
+    restart: unless-stopped
+    volumes:
+      - ./config/file:/app/config
+    ports:
+      - "3004:3004"
+
   local-db:
     image: postgres:15.1-alpine3.17
     container_name: johnjud-local-db
