@@ -64,10 +64,6 @@ func (s *Service) Update(_ context.Context, req *proto.UpdatePetRequest) (res *p
 
 	var images []*image_proto.Image
 	// images, err := s.imageService.FindByPetId(req.Pet.Id)
-	// if err != nil {
-	// 	return nil, status.Error(codes.Internal, "error querying image service")
-	// }
-	// imageUrls := ExtractImageUrls(images)
 	return &proto.UpdatePetResponse{Pet: RawToDto(raw, images)}, nil
 }
 
@@ -99,22 +95,13 @@ func (s *Service) FindAll(_ context.Context, req *proto.FindAllPetRequest) (res 
 		return nil, status.Error(codes.Unavailable, "Internal error")
 	}
 
-	imageUrlsList := make([][]*image_proto.Image, len(pets))
-	// for _, pet := range pets {
-	// 	images, err := s.imageService.FindByPetId(pet.ID.String())
-	// 	if err != nil {
-	// 		return nil, status.Error(codes.Internal, "error querying image service")
-	// 	}
-	// 	imageUrls := ExtractImageUrls(images)
-	// 	imageUrlsList = append(imageUrlsList, imageUrls)
-	// }
-
-	petWithImageUrls, err := RawToDtoList(&pets, imageUrlsList)
+	imagesList := make([][]*image_proto.Image, len(pets))
+	petWithImages, err := RawToDtoList(&pets, imagesList)
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, "error converting raw to dto list")
 	}
 
-	return &proto.FindAllPetResponse{Pets: petWithImageUrls}, nil
+	return &proto.FindAllPetResponse{Pets: petWithImages}, nil
 }
 
 func (s Service) FindOne(_ context.Context, req *proto.FindOnePetRequest) (res *proto.FindOnePetResponse, err error) {
@@ -127,14 +114,7 @@ func (s Service) FindOne(_ context.Context, req *proto.FindOnePetRequest) (res *
 		return nil, status.Error(codes.NotFound, err.Error())
 	}
 
-	// images := make([]*image_proto.Image, 3)
 	var images []*image_proto.Image
-	// images, err := s.imageService.FindByPetId(req.Id)
-	// if err != nil {
-	// 	return nil, status.Error(codes.Internal, "error querying image service")
-	// }
-	// imageUrls := ExtractImageUrls(images)
-
 	return &proto.FindOnePetResponse{Pet: RawToDto(&pet, images)}, err
 }
 
@@ -181,7 +161,6 @@ func RawToDtoList(in *[]*pet.Pet, imagesList [][]*image_proto.Image) ([]*proto.P
 
 	for i, e := range *in {
 		result = append(result, RawToDto(e, imagesList[i]))
-		// result = append(result, RawToDto(e, ))
 	}
 	return result, nil
 }
