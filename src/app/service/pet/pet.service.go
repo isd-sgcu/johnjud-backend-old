@@ -67,7 +67,7 @@ func (s *Service) Update(_ context.Context, req *proto.UpdatePetRequest) (res *p
 	// 	return nil, status.Error(codes.Internal, "error querying image service")
 	// }
 	// imageUrls := ExtractImageUrls(images)
-	return &proto.UpdatePetResponse{Pet: RawToDto(raw, []string{})}, nil
+	return &proto.UpdatePetResponse{Pet: RawToDto(raw, nil)}, nil
 }
 
 func (s *Service) ChangeView(_ context.Context, req *proto.ChangeViewPetRequest) (res *proto.ChangeViewPetResponse, err error) {
@@ -132,7 +132,7 @@ func (s Service) FindOne(_ context.Context, req *proto.FindOnePetRequest) (res *
 	// }
 	// imageUrls := ExtractImageUrls(images)
 
-	return &proto.FindOnePetResponse{Pet: RawToDto(&pet, []string{})}, err
+	return &proto.FindOnePetResponse{Pet: RawToDto(&pet, nil)}, err
 }
 
 func (s *Service) Create(_ context.Context, req *proto.CreatePetRequest) (res *proto.CreatePetResponse, err error) {
@@ -141,14 +141,12 @@ func (s *Service) Create(_ context.Context, req *proto.CreatePetRequest) (res *p
 		return nil, status.Error(codes.InvalidArgument, "error converting dto to raw: "+err.Error())
 	}
 
-	imgUrls := []string{}
-
 	err = s.repository.Create(raw)
 	if err != nil {
 		return nil, status.Error(codes.Internal, "failed to create pet")
 	}
 
-	return &proto.CreatePetResponse{Pet: RawToDto(raw, imgUrls)}, nil
+	return &proto.CreatePetResponse{Pet: RawToDto(raw, nil)}, nil
 }
 
 func (s *Service) AdoptPet(ctx context.Context, req *proto.AdoptPetRequest) (res *proto.AdoptPetResponse, err error) {
@@ -178,12 +176,12 @@ func RawToDtoList(in *[]*pet.Pet, imageUrls [][]string) ([]*proto.Pet, error) {
 
 	for _, e := range *in {
 		// result = append(result, RawToDto(e, imageUrls[i]))
-		result = append(result, RawToDto(e, []string{}))
+		result = append(result, RawToDto(e, nil))
 	}
 	return result, nil
 }
 
-func RawToDto(in *pet.Pet, imgUrl []string) *proto.Pet {
+func RawToDto(in *pet.Pet, images []*image_proto.Image) *proto.Pet {
 	return &proto.Pet{
 		Id:           in.ID.String(),
 		Type:         in.Type,
@@ -194,7 +192,7 @@ func RawToDto(in *pet.Pet, imgUrl []string) *proto.Pet {
 		Habit:        in.Habit,
 		Caption:      in.Caption,
 		Status:       proto.PetStatus(in.Status),
-		ImageUrls:    imgUrl,
+		Images:       nil,
 		IsSterile:    *in.IsSterile,
 		IsVaccinated: *in.IsVaccinated,
 		IsVisible:    *in.IsVisible,
