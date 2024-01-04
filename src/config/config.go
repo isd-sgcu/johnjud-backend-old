@@ -19,9 +19,14 @@ type App struct {
 	Debug bool `mapstructure:"debug"`
 }
 
+type Service struct {
+	File string `mapstructure:"file"`
+}
+
 type Config struct {
 	App      App      `mapstructure:"app"`
 	Database Database `mapstructure:"database"`
+	Service  Service  `mapstructure:"service"`
 }
 
 func LoadConfig() (config *Config, err error) {

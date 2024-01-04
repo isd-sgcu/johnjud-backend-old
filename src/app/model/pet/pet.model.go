@@ -22,4 +22,5 @@ type Pet struct {
 	Background   string     `json:"background" gorm:"tinytext"`
 	Address      string     `json:"address" gorm:"tinytext"`
 	Contact      string     `json:"contact" gorm:"tinytext"`
+	AdoptBy      string     `json:"adopt_by" gorm:"tinytext"`
 }

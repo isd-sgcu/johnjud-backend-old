@@ -1,13 +1,14 @@
 app:
-  port: 3003
+  port: 3004
   debug: true
 
 database:
-  host: localhost
+  host: local-db
   port: 5432
   name: johnjud_db
   username: root
   password: root
 
-service: 
-  file: localhost:3004
+s3:
+  bucket_name: <bucket name>
+  region: <region>

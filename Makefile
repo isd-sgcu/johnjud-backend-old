@@ -3,8 +3,8 @@ proto:
 
 publish:
 	cat ./token.txt | docker login --username isd-team-sgcu --password-stdin ghcr.io
-	docker build . -t ghcr.io/isd-sgcu/johnjud-gateway
-	docker push ghcr.io/isd-sgcu/johnjud-gateway
+	docker build . -t ghcr.io/isd-sgcu/johnjud-backend
+	docker push ghcr.io/isd-sgcu/johnjud-backend
 
 test:
 	go vet ./...

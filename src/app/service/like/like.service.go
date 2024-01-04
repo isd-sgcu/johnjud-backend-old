@@ -15,6 +15,7 @@ import (
 )
 
 type Service struct {
+	proto.UnimplementedLikeServiceServer
 	repository IRepository
 }
 
