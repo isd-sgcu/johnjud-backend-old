@@ -62,12 +62,13 @@ func (s *Service) Update(_ context.Context, req *proto.UpdatePetRequest) (res *p
 		return nil, status.Error(codes.NotFound, "pet not found")
 	}
 
+	var images []*image_proto.Image
 	// images, err := s.imageService.FindByPetId(req.Pet.Id)
 	// if err != nil {
 	// 	return nil, status.Error(codes.Internal, "error querying image service")
 	// }
 	// imageUrls := ExtractImageUrls(images)
-	return &proto.UpdatePetResponse{Pet: RawToDto(raw, nil)}, nil
+	return &proto.UpdatePetResponse{Pet: RawToDto(raw, images)}, nil
 }
 
 func (s *Service) ChangeView(_ context.Context, req *proto.ChangeViewPetRequest) (res *proto.ChangeViewPetResponse, err error) {
@@ -98,7 +99,7 @@ func (s *Service) FindAll(_ context.Context, req *proto.FindAllPetRequest) (res 
 		return nil, status.Error(codes.Unavailable, "Internal error")
 	}
 
-	imageUrlsList := make([][]string, len(pets))
+	imageUrlsList := make([][]*image_proto.Image, len(pets))
 	// for _, pet := range pets {
 	// 	images, err := s.imageService.FindByPetId(pet.ID.String())
 	// 	if err != nil {
@@ -126,13 +127,15 @@ func (s Service) FindOne(_ context.Context, req *proto.FindOnePetRequest) (res *
 		return nil, status.Error(codes.NotFound, err.Error())
 	}
 
+	// images := make([]*image_proto.Image, 3)
+	var images []*image_proto.Image
 	// images, err := s.imageService.FindByPetId(req.Id)
 	// if err != nil {
 	// 	return nil, status.Error(codes.Internal, "error querying image service")
 	// }
 	// imageUrls := ExtractImageUrls(images)
 
-	return &proto.FindOnePetResponse{Pet: RawToDto(&pet, nil)}, err
+	return &proto.FindOnePetResponse{Pet: RawToDto(&pet, images)}, err
 }
 
 func (s *Service) Create(_ context.Context, req *proto.CreatePetRequest) (res *proto.CreatePetResponse, err error) {
@@ -146,7 +149,9 @@ func (s *Service) Create(_ context.Context, req *proto.CreatePetRequest) (res *p
 		return nil, status.Error(codes.Internal, "failed to create pet")
 	}
 
-	return &proto.CreatePetResponse{Pet: RawToDto(raw, nil)}, nil
+	var images []*image_proto.Image
+
+	return &proto.CreatePetResponse{Pet: RawToDto(raw, images)}, nil
 }
 
 func (s *Service) AdoptPet(ctx context.Context, req *proto.AdoptPetRequest) (res *proto.AdoptPetResponse, err error) {
@@ -168,15 +173,15 @@ func (s *Service) AdoptPet(ctx context.Context, req *proto.AdoptPetRequest) (res
 	return &proto.AdoptPetResponse{Success: true}, nil
 }
 
-func RawToDtoList(in *[]*pet.Pet, imageUrls [][]string) ([]*proto.Pet, error) {
+func RawToDtoList(in *[]*pet.Pet, imagesList [][]*image_proto.Image) ([]*proto.Pet, error) {
 	var result []*proto.Pet
-	if len(*in) != len(imageUrls) {
+	if len(*in) != len(imagesList) {
 		return nil, status.Error(codes.InvalidArgument, "length of in and imageUrls have to be the same")
 	}
 
-	for _, e := range *in {
-		// result = append(result, RawToDto(e, imageUrls[i]))
-		result = append(result, RawToDto(e, nil))
+	for i, e := range *in {
+		result = append(result, RawToDto(e, imagesList[i]))
+		// result = append(result, RawToDto(e, ))
 	}
 	return result, nil
 }
@@ -192,7 +197,7 @@ func RawToDto(in *pet.Pet, images []*image_proto.Image) *proto.Pet {
 		Habit:        in.Habit,
 		Caption:      in.Caption,
 		Status:       proto.PetStatus(in.Status),
-		Images:       nil,
+		Images:       images,
 		IsSterile:    *in.IsSterile,
 		IsVaccinated: *in.IsVaccinated,
 		IsVisible:    *in.IsVisible,
