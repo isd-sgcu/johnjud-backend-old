@@ -3,7 +3,6 @@ version: "3.9"
 services:
   local-file:
     image: ghcr.io/isd-sgcu/johnjud-file
-    platform: linux/amd64
     container_name: file
     depends_on:
       - local-db
