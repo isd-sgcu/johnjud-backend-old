@@ -145,7 +145,7 @@ func (s *Service) Create(_ context.Context, req *proto.CreatePetRequest) (res *p
 
 	err = s.repository.Create(raw)
 	if err != nil {
-		return nil, status.Error(codes.InvalidArgument, "failed to create pet")
+		return nil, status.Error(codes.Internal, "failed to create pet")
 	}
 
 	return &proto.CreatePetResponse{Pet: RawToDto(raw, imgUrls)}, nil
@@ -158,7 +158,7 @@ func (s *Service) AdoptPet(ctx context.Context, req *proto.AdoptPetRequest) (res
 	}
 	pet, err := DtoToRaw(dtoPet.Pet)
 	if err != nil {
-		return nil, status.Error(codes.Internal, "error converting dto to raw")
+		return nil, status.Error(codes.InvalidArgument, "error converting dto to raw")
 	}
 	pet.AdoptBy = req.UserId
 
