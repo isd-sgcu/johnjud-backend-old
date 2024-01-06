@@ -1,6 +1,7 @@
 package pet
 
 import (
+	"github.com/google/uuid"
 	"github.com/isd-sgcu/johnjud-backend/src/app/model/pet"
 	"gorm.io/gorm"
 )
@@ -18,7 +19,15 @@ func (r *Repository) FindAll(result *[]*pet.Pet) error {
 }
 
 func (r *Repository) FindOne(id string, result *pet.Pet) error {
-	return r.db.Model(&pet.Pet{}).Find(result, "id = ?", id).Error
+	if err := r.db.Model(&pet.Pet{}).Find(result, "id = ?", id).Error; err != nil {
+		return err
+	}
+
+	if result.ID == uuid.Nil {
+		return gorm.ErrRecordNotFound
+	}
+
+	return nil
 }
 
 func (r *Repository) Create(in *pet.Pet) error {

@@ -15,10 +15,10 @@ type Pet struct {
 	Habit        string     `json:"habit" gorm:"mediumtext"`
 	Caption      string     `json:"caption" gorm:"mediumtext"`
 	Status       pet.Status `json:"status" gorm:"mediumtext" example:"findhome"`
-	IsSterile    bool       `json:"is_sterile"`
-	IsVaccinated bool       `json:"is_vaccine"`
-	IsVisible    bool       `json:"is_visible"`
-	IsClubPet    bool       `json:"is_club_pet"`
+	IsSterile    *bool      `json:"is_sterile"`
+	IsVaccinated *bool      `json:"is_vaccine"`
+	IsVisible    *bool      `json:"is_visible"`
+	IsClubPet    *bool      `json:"is_club_pet"`
 	Background   string     `json:"background" gorm:"tinytext"`
 	Address      string     `json:"address" gorm:"tinytext"`
 	Contact      string     `json:"contact" gorm:"tinytext"`

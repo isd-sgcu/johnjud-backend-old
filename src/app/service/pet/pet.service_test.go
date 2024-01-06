@@ -15,6 +15,7 @@ import (
 
 	"github.com/isd-sgcu/johnjud-backend/src/app/model"
 	"github.com/isd-sgcu/johnjud-backend/src/app/model/pet"
+	"github.com/isd-sgcu/johnjud-backend/src/app/utils"
 	proto "github.com/isd-sgcu/johnjud-go-proto/johnjud/backend/pet/v1"
 	img_proto "github.com/isd-sgcu/johnjud-go-proto/johnjud/file/image/v1"
 
@@ -66,26 +67,17 @@ func (t *PetServiceTest) SetupTest() {
 			Habit:        faker.Paragraph(),
 			Caption:      faker.Paragraph(),
 			Status:       petConst.Status(rand.Intn(1) + 1),
-			IsSterile:    true,
-			IsVaccinated: true,
-			IsVisible:    true,
-			IsClubPet:    true,
+			IsSterile:    utils.BoolAddr(true),
+			IsVaccinated: utils.BoolAddr(true),
+			IsVisible:    utils.BoolAddr(true),
+			IsClubPet:    utils.BoolAddr(true),
 			Background:   faker.Paragraph(),
 			Address:      faker.Paragraph(),
 			Contact:      faker.Paragraph(),
 			AdoptBy:      "",
 		}
 		var images []*img_proto.Image
-		var imageUrls []string
-		for i := 0; i < 3; i++ {
-			url := faker.URL()
-			images = append(images, &img_proto.Image{
-				Id:       faker.UUIDDigit(),
-				PetId:    pet.ID.String(),
-				ImageUrl: url,
-			})
-			imageUrls = append(imageUrls, url)
-		}
+		imageUrls := []string{}
 		t.ImagesList = append(t.ImagesList, images)
 		t.ImageUrlsList = append(t.ImageUrlsList, imageUrls)
 		pets = append(pets, pet)
@@ -93,12 +85,6 @@ func (t *PetServiceTest) SetupTest() {
 
 	t.Pets = pets
 	t.Pet = pets[0]
-
-	for _, images := range t.ImagesList {
-		for _, image := range images {
-			t.ImageUrls = append(t.ImageUrls, image.ImageUrl)
-		}
-	}
 
 	t.Images = t.ImagesList[0]
 	t.ImageUrls = t.ImageUrlsList[0]
@@ -113,14 +99,14 @@ func (t *PetServiceTest) SetupTest() {
 		Habit:        t.Pet.Habit,
 		Caption:      t.Pet.Caption,
 		Status:       proto.PetStatus(t.Pet.Status),
-		IsSterile:    t.Pet.IsSterile,
-		IsVaccinated: t.Pet.IsVaccinated,
-		IsVisible:    t.Pet.IsVisible,
-		IsClubPet:    t.Pet.IsClubPet,
+		IsSterile:    *t.Pet.IsSterile,
+		IsVaccinated: *t.Pet.IsVaccinated,
+		IsVisible:    *t.Pet.IsVisible,
+		IsClubPet:    *t.Pet.IsClubPet,
 		Background:   t.Pet.Background,
 		Address:      t.Pet.Address,
 		Contact:      t.Pet.Contact,
-		ImageUrls:    t.ImageUrls,
+		Images:       t.Images,
 	}
 
 	t.UpdatePet = &pet.Pet{
@@ -164,7 +150,7 @@ func (t *PetServiceTest) SetupTest() {
 		Status:       t.Pet.Status,
 		IsSterile:    t.Pet.IsSterile,
 		IsVaccinated: t.Pet.IsVaccinated,
-		IsVisible:    false,
+		IsVisible:    utils.BoolAddr(false),
 		IsClubPet:    t.Pet.IsClubPet,
 		Background:   t.Pet.Background,
 		Address:      t.Pet.Address,
@@ -181,11 +167,11 @@ func (t *PetServiceTest) SetupTest() {
 			Habit:        t.Pet.Habit,
 			Caption:      t.Pet.Caption,
 			Status:       proto.PetStatus(t.Pet.Status),
-			ImageUrls:    t.ImageUrls,
-			IsSterile:    t.Pet.IsSterile,
-			IsVaccinated: t.Pet.IsVaccinated,
-			IsVisible:    t.Pet.IsVaccinated,
-			IsClubPet:    t.Pet.IsClubPet,
+			Images:       t.Images,
+			IsSterile:    *t.Pet.IsSterile,
+			IsVaccinated: *t.Pet.IsVaccinated,
+			IsVisible:    *t.Pet.IsVaccinated,
+			IsClubPet:    *t.Pet.IsClubPet,
 			Background:   t.Pet.Background,
 			Address:      t.Pet.Address,
 			Contact:      t.Pet.Contact,
@@ -203,11 +189,11 @@ func (t *PetServiceTest) SetupTest() {
 			Habit:        t.Pet.Habit,
 			Caption:      t.Pet.Caption,
 			Status:       proto.PetStatus(t.Pet.Status),
-			ImageUrls:    t.ImageUrls,
-			IsSterile:    t.Pet.IsSterile,
-			IsVaccinated: t.Pet.IsVaccinated,
-			IsVisible:    t.Pet.IsVisible,
-			IsClubPet:    t.Pet.IsClubPet,
+			Images:       t.Images,
+			IsSterile:    *t.Pet.IsSterile,
+			IsVaccinated: *t.Pet.IsVaccinated,
+			IsVisible:    *t.Pet.IsVisible,
+			IsClubPet:    *t.Pet.IsClubPet,
 			Background:   t.Pet.Background,
 			Address:      t.Pet.Address,
 			Contact:      t.Pet.Contact,
@@ -322,7 +308,7 @@ func (t *PetServiceTest) TestFindOneSuccess() {
 
 func (t *PetServiceTest) TestFindAllSuccess() {
 
-	want := &proto.FindAllPetResponse{Pets: t.createPetsDto(t.Pets, t.ImageUrlsList)}
+	want := &proto.FindAllPetResponse{Pets: t.createPetsDto(t.Pets, t.ImagesList)}
 
 	var petsIn []*pet.Pet
 
@@ -377,10 +363,10 @@ func createPets() []*pet.Pet {
 			Habit:        faker.Paragraph(),
 			Caption:      faker.Paragraph(),
 			Status:       petConst.Status(rand.Intn(1) + 1),
-			IsSterile:    true,
-			IsVaccinated: true,
-			IsVisible:    true,
-			IsClubPet:    true,
+			IsSterile:    utils.BoolAddr(true),
+			IsVaccinated: utils.BoolAddr(true),
+			IsVisible:    utils.BoolAddr(true),
+			IsClubPet:    utils.BoolAddr(true),
 			Background:   faker.Paragraph(),
 			Address:      faker.Paragraph(),
 			Contact:      faker.Paragraph(),
@@ -391,7 +377,7 @@ func createPets() []*pet.Pet {
 	return result
 }
 
-func (t *PetServiceTest) createPetsDto(in []*pet.Pet, imageUrlsList [][]string) []*proto.Pet {
+func (t *PetServiceTest) createPetsDto(in []*pet.Pet, images [][]*img_proto.Image) []*proto.Pet {
 	var result []*proto.Pet
 
 	for i, p := range in {
@@ -405,11 +391,11 @@ func (t *PetServiceTest) createPetsDto(in []*pet.Pet, imageUrlsList [][]string) 
 			Habit:        p.Habit,
 			Caption:      p.Caption,
 			Status:       proto.PetStatus(p.Status),
-			ImageUrls:    imageUrlsList[i],
-			IsSterile:    p.IsSterile,
-			IsVaccinated: p.IsVaccinated,
-			IsVisible:    p.IsVisible,
-			IsClubPet:    p.IsClubPet,
+			Images:       images[i],
+			IsSterile:    *p.IsSterile,
+			IsVaccinated: *p.IsVaccinated,
+			IsVisible:    *p.IsVisible,
+			IsClubPet:    *p.IsClubPet,
 			Background:   p.Background,
 			Address:      p.Address,
 			Contact:      p.Contact,
@@ -423,7 +409,7 @@ func (t *PetServiceTest) createPetsDto(in []*pet.Pet, imageUrlsList [][]string) 
 
 func (t *PetServiceTest) TestCreateSuccess() {
 	want := &proto.CreatePetResponse{Pet: t.PetDto}
-	want.Pet.ImageUrls = []string{} // when pet is first created, it has no images
+	want.Pet.Images = nil // when pet is first created, it has no images
 
 	repo := &mock.RepositoryMock{}
 
