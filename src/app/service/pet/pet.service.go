@@ -3,13 +3,10 @@ package pet
 import (
 	"context"
 	"errors"
+	"fmt"
 
-	"time"
-
-	"github.com/google/uuid"
-	"github.com/isd-sgcu/johnjud-backend/src/app/model"
 	"github.com/isd-sgcu/johnjud-backend/src/app/model/pet"
-	petConst "github.com/isd-sgcu/johnjud-backend/src/constant/pet"
+	petUtils "github.com/isd-sgcu/johnjud-backend/src/app/utils/pet"
 	proto "github.com/isd-sgcu/johnjud-go-proto/johnjud/backend/pet/v1"
 	image_proto "github.com/isd-sgcu/johnjud-go-proto/johnjud/file/image/v1"
 	"github.com/rs/zerolog/log"
@@ -52,7 +49,7 @@ func (s *Service) Delete(ctx context.Context, req *proto.DeletePetRequest) (*pro
 }
 
 func (s *Service) Update(_ context.Context, req *proto.UpdatePetRequest) (res *proto.UpdatePetResponse, err error) {
-	raw, err := DtoToRaw(req.Pet)
+	raw, err := petUtils.DtoToRaw(req.Pet)
 	if err != nil {
 		return nil, status.Error(codes.Internal, "error converting dto to raw")
 	}
@@ -67,7 +64,7 @@ func (s *Service) Update(_ context.Context, req *proto.UpdatePetRequest) (res *p
 		return nil, status.Error(codes.Internal, "error querying image service")
 	}
 
-	return &proto.UpdatePetResponse{Pet: RawToDto(raw, images)}, nil
+	return &proto.UpdatePetResponse{Pet: petUtils.RawToDto(raw, images)}, nil
 }
 
 func (s *Service) ChangeView(_ context.Context, req *proto.ChangeViewPetRequest) (res *proto.ChangeViewPetResponse, err error) {
@@ -75,7 +72,7 @@ func (s *Service) ChangeView(_ context.Context, req *proto.ChangeViewPetRequest)
 	if err != nil {
 		return nil, status.Error(codes.NotFound, "pet not found")
 	}
-	pet, err := DtoToRaw(petData.Pet)
+	pet, err := petUtils.DtoToRaw(petData.Pet)
 	if err != nil {
 		return nil, status.Error(codes.Internal, "error converting dto to raw")
 	}
@@ -106,12 +103,11 @@ func (s *Service) FindAll(_ context.Context, req *proto.FindAllPetRequest) (res 
 		}
 		imagesList = append(imagesList, images)
 	}
-
-	petWithImages, err := RawToDtoList(&pets, imagesList)
+	fmt.Println(req)
+	petWithImages, err := petUtils.RawToDtoList(&pets, imagesList, req)
 	if err != nil {
-		return nil, status.Error(codes.Internal, "error converting raw to dto list")
+		return nil, status.Error(codes.Internal, fmt.Sprintf("error converting raw to dto list: %v", err))
 	}
-
 	return &proto.FindAllPetResponse{Pets: petWithImages}, nil
 }
 
@@ -130,11 +126,11 @@ func (s Service) FindOne(_ context.Context, req *proto.FindOnePetRequest) (res *
 		return nil, status.Error(codes.Internal, "error querying image service")
 	}
 
-	return &proto.FindOnePetResponse{Pet: RawToDto(&pet, images)}, err
+	return &proto.FindOnePetResponse{Pet: petUtils.RawToDto(&pet, images)}, err
 }
 
 func (s *Service) Create(_ context.Context, req *proto.CreatePetRequest) (res *proto.CreatePetResponse, err error) {
-	raw, err := DtoToRaw(req.Pet)
+	raw, err := petUtils.DtoToRaw(req.Pet)
 	if err != nil {
 		return nil, status.Error(codes.Internal, "error converting dto to raw: "+err.Error())
 	}
@@ -146,7 +142,7 @@ func (s *Service) Create(_ context.Context, req *proto.CreatePetRequest) (res *p
 		return nil, status.Error(codes.Internal, "failed to create pet")
 	}
 
-	return &proto.CreatePetResponse{Pet: RawToDto(raw, images)}, nil
+	return &proto.CreatePetResponse{Pet: petUtils.RawToDto(raw, images)}, nil
 }
 
 func (s *Service) AdoptPet(ctx context.Context, req *proto.AdoptPetRequest) (res *proto.AdoptPetResponse, err error) {
@@ -154,7 +150,7 @@ func (s *Service) AdoptPet(ctx context.Context, req *proto.AdoptPetRequest) (res
 	if err != nil {
 		return nil, status.Error(codes.NotFound, "pet not found")
 	}
-	pet, err := DtoToRaw(dtoPet.Pet)
+	pet, err := petUtils.DtoToRaw(dtoPet.Pet)
 	if err != nil {
 		return nil, status.Error(codes.Internal, "error converting dto to raw")
 	}
@@ -166,103 +162,4 @@ func (s *Service) AdoptPet(ctx context.Context, req *proto.AdoptPetRequest) (res
 	}
 
 	return &proto.AdoptPetResponse{Success: true}, nil
-}
-
-func RawToDtoList(in *[]*pet.Pet, images [][]*image_proto.Image) ([]*proto.Pet, error) {
-	var result []*proto.Pet
-	if len(*in) != len(images) {
-		return nil, errors.New("length of in and imageUrls have to be the same")
-	}
-
-	for i, e := range *in {
-		result = append(result, RawToDto(e, images[i]))
-	}
-	return result, nil
-}
-
-func RawToDto(in *pet.Pet, images []*image_proto.Image) *proto.Pet {
-	return &proto.Pet{
-		Id:           in.ID.String(),
-		Type:         in.Type,
-		Species:      in.Species,
-		Name:         in.Name,
-		Birthdate:    in.Birthdate,
-		Gender:       string(in.Gender),
-		Color:        in.Color,
-		Pattern:      in.Pattern,
-		Habit:        in.Habit,
-		Caption:      in.Caption,
-		Status:       string(in.Status),
-		Images:       images,
-		IsSterile:    in.IsSterile,
-		IsVaccinated: in.IsVaccinated,
-		IsVisible:    in.IsVisible,
-		IsClubPet:    in.IsClubPet,
-		Origin:       in.Origin,
-		Address:      in.Address,
-		Contact:      in.Contact,
-		AdoptBy:      in.AdoptBy,
-	}
-}
-
-func DtoToRaw(in *proto.Pet) (res *pet.Pet, err error) {
-	var id uuid.UUID
-	var gender petConst.Gender
-	var status petConst.Status
-
-	if in.Id != "" {
-		id, err = uuid.Parse(in.Id)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	switch in.Gender {
-	case string(petConst.MALE):
-		gender = petConst.MALE
-	case string(petConst.FEMALE):
-		gender = petConst.FEMALE
-	}
-
-	switch in.Status {
-	case string(petConst.ADOPTED):
-		status = petConst.ADOPTED
-	case string(petConst.FINDHOME):
-		status = petConst.FINDHOME
-	}
-
-	return &pet.Pet{
-		Base: model.Base{
-			ID:        id,
-			CreatedAt: time.Time{},
-			UpdatedAt: time.Time{},
-			DeletedAt: gorm.DeletedAt{},
-		},
-		Type:         in.Type,
-		Species:      in.Species,
-		Name:         in.Name,
-		Birthdate:    in.Birthdate,
-		Gender:       gender,
-		Color:        in.Color,
-		Pattern:      in.Pattern,
-		Habit:        in.Habit,
-		Caption:      in.Caption,
-		Status:       status,
-		IsSterile:    in.IsSterile,
-		IsVaccinated: in.IsVaccinated,
-		IsVisible:    in.IsVisible,
-		IsClubPet:    in.IsClubPet,
-		Origin:       in.Origin,
-		Address:      in.Address,
-		Contact:      in.Contact,
-		AdoptBy:      in.AdoptBy,
-	}, nil
-}
-
-func ExtractImageUrls(in []*image_proto.Image) []string {
-	var result []string
-	for _, e := range in {
-		result = append(result, e.ImageUrl)
-	}
-	return result
 }
