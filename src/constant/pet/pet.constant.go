@@ -13,3 +13,6 @@ const (
 	ADOPTED  Status = "adopted"
 	FINDHOME Status = "findhome"
 )
+
+const HOUR = 24
+const YEAR = 365
