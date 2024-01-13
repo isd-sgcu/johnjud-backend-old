@@ -22,7 +22,7 @@ type Service struct {
 }
 
 type IRepository interface {
-	FindAll(*[]*pet.Pet, *proto.FindAllPetRequest) error
+	FindAll(*[]*pet.Pet) error
 	FindOne(string, *pet.Pet) error
 	Create(*pet.Pet) error
 	Update(string, *pet.Pet) error
@@ -90,11 +90,14 @@ func (s *Service) FindAll(_ context.Context, req *proto.FindAllPetRequest) (res 
 	var pets []*pet.Pet
 	var imagesList [][]*image_proto.Image
 
-	err = s.repository.FindAll(&pets, req)
+	err = s.repository.FindAll(&pets)
 	if err != nil {
 		log.Error().Err(err).Str("service", "event").Str("module", "find all").Msg("Error while querying all events")
 		return nil, status.Error(codes.Unavailable, "Internal error")
 	}
+
+	petUtils.FilterPet(&pets, req)
+	petUtils.PaginatePets(&pets, req.Page, req.PageSize)
 
 	for _, pet := range pets {
 		images, err := s.imageService.FindByPetId(pet.ID.String())
