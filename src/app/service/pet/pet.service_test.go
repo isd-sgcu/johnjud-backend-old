@@ -33,7 +33,6 @@ type PetServiceTest struct {
 	ChangeViewPet        *pet.Pet
 	Pets                 []*pet.Pet
 	PetDto               *proto.Pet
-	FindAllPetReqMock    *proto.FindAllPetRequest
 	CreatePetReqMock     *proto.CreatePetRequest
 	UpdatePetReqMock     *proto.UpdatePetRequest
 	ChangeViewPetReqMock *proto.ChangeViewPetRequest
@@ -118,18 +117,6 @@ func (t *PetServiceTest) SetupTest() {
 		Address:      t.Pet.Address,
 		Contact:      t.Pet.Contact,
 		Images:       t.Images,
-	}
-
-	t.FindAllPetReqMock = &proto.FindAllPetRequest{
-		Search:   "",
-		Type:     "",
-		Gender:   "",
-		Color:    "",
-		Pattern:  "",
-		Age:      "",
-		Origin:   "",
-		PageSize: 0,
-		Page:     0,
 	}
 
 	t.UpdatePet = &pet.Pet{
@@ -346,7 +333,7 @@ func (t *PetServiceTest) TestFindAllSuccess() {
 	var petsIn []*pet.Pet
 
 	repo := &mock.RepositoryMock{}
-	repo.On("FindAll", petsIn, t.FindAllPetReqMock).Return(&t.Pets, nil)
+	repo.On("FindAll", petsIn).Return(&t.Pets, nil)
 
 	imgSrv := new(img_mock.ServiceMock)
 	for i, pet := range t.Pets {
@@ -355,7 +342,7 @@ func (t *PetServiceTest) TestFindAllSuccess() {
 
 	srv := NewService(repo, imgSrv)
 
-	actual, err := srv.FindAll(context.Background(), t.FindAllPetReqMock)
+	actual, err := srv.FindAll(context.Background(), &proto.FindAllPetRequest{})
 	assert.Nil(t.T(), err)
 	assert.Equal(t.T(), want, actual)
 }
