@@ -7,7 +7,7 @@ import (
 
 var pets = []pet.Pet{
 	{
-		Type:         "",
+		Type:         "cat",
 		Species:      "",
 		Name:         "เต้าเจี้ยว",
 		Birthdate:    "",
@@ -26,7 +26,7 @@ var pets = []pet.Pet{
 		Contact:      "",
 		AdoptBy:      "",
 	}, {
-		Type:         "",
+		Type:         "cat",
 		Species:      "",
 		Name:         "ซีอิ๊ว",
 		Birthdate:    "",
@@ -45,7 +45,7 @@ var pets = []pet.Pet{
 		Contact:      "",
 		AdoptBy:      "",
 	}, {
-		Type:         "",
+		Type:         "cat",
 		Species:      "",
 		Name:         "พัดพา",
 		Birthdate:    "",
@@ -64,7 +64,7 @@ var pets = []pet.Pet{
 		Contact:      "",
 		AdoptBy:      "",
 	}, {
-		Type:         "",
+		Type:         "cat",
 		Species:      "",
 		Name:         "โอริโอ้",
 		Birthdate:    "",
@@ -83,7 +83,7 @@ var pets = []pet.Pet{
 		Contact:      "",
 		AdoptBy:      "",
 	}, {
-		Type:         "",
+		Type:         "cat",
 		Species:      "",
 		Name:         "แม่พลอย",
 		Birthdate:    "",
@@ -102,7 +102,7 @@ var pets = []pet.Pet{
 		Contact:      "",
 		AdoptBy:      "",
 	}, {
-		Type:         "",
+		Type:         "cat",
 		Species:      "",
 		Name:         "แมงมุม",
 		Birthdate:    "",
@@ -121,7 +121,7 @@ var pets = []pet.Pet{
 		Contact:      "",
 		AdoptBy:      "",
 	}, {
-		Type:         "",
+		Type:         "cat",
 		Species:      "",
 		Name:         "ลูกหม่อน",
 		Birthdate:    "",
@@ -140,7 +140,7 @@ var pets = []pet.Pet{
 		Contact:      "",
 		AdoptBy:      "",
 	}, {
-		Type:         "",
+		Type:         "cat",
 		Species:      "",
 		Name:         "ซาบะ",
 		Birthdate:    "",
@@ -159,7 +159,7 @@ var pets = []pet.Pet{
 		Contact:      "",
 		AdoptBy:      "",
 	}, {
-		Type:         "",
+		Type:         "cat",
 		Species:      "",
 		Name:         "ทูน่า",
 		Birthdate:    "",
@@ -178,7 +178,7 @@ var pets = []pet.Pet{
 		Contact:      "",
 		AdoptBy:      "",
 	}, {
-		Type:         "",
+		Type:         "cat",
 		Species:      "",
 		Name:         "มีจ้า",
 		Birthdate:    "",
@@ -197,7 +197,7 @@ var pets = []pet.Pet{
 		Contact:      "",
 		AdoptBy:      "",
 	}, {
-		Type:         "",
+		Type:         "cat",
 		Species:      "",
 		Name:         "หวานเจี๊ยบ",
 		Birthdate:    "",
@@ -216,7 +216,7 @@ var pets = []pet.Pet{
 		Contact:      "",
 		AdoptBy:      "",
 	}, {
-		Type:         "",
+		Type:         "cat",
 		Species:      "",
 		Name:         "มะกอก & มะกรูด",
 		Birthdate:    "",
@@ -230,12 +230,12 @@ var pets = []pet.Pet{
 		IsVaccinated: true,
 		IsVisible:    true,
 		IsClubPet:    false,
-		Origin:       "ซอยราชครู ถ.พหลโยธิน พญาไท",
-		Address:      "",
+		Origin:       "",
+		Address:      "ซอยราชครู ถ.พหลโยธิน พญาไท",
 		Contact:      "เบอร์โทร 0863450127 , Line ID: pumviranee",
 		AdoptBy:      "",
 	}, {
-		Type:         "",
+		Type:         "cat",
 		Species:      "",
 		Name:         "น้องมอม",
 		Birthdate:    "",
@@ -249,12 +249,12 @@ var pets = []pet.Pet{
 		IsVaccinated: true,
 		IsVisible:    true,
 		IsClubPet:    false,
-		Origin:       "บางรัก",
-		Address:      "",
+		Origin:       "",
+		Address:      "บางรัก",
 		Contact:      "inbox โดยตรงที่ Noppawan Pleankhum",
 		AdoptBy:      "",
 	}, {
-		Type:         "",
+		Type:         "cat",
 		Species:      "",
 		Name:         "น้องเด็กหรือแมวเด็ก",
 		Birthdate:    "",
@@ -268,8 +268,8 @@ var pets = []pet.Pet{
 		IsVaccinated: false,
 		IsVisible:    true,
 		IsClubPet:    false,
-		Origin:       "ราชเทวี",
-		Address:      "",
+		Origin:       "",
+		Address:      "ราชเทวี",
 		Contact:      "Line ID: @paboyababy , เบอร์โทร 0846145357",
 		AdoptBy:      "",
 	},
