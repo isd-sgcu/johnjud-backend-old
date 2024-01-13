@@ -2,7 +2,6 @@ package pet
 
 import (
 	"github.com/isd-sgcu/johnjud-backend/src/app/model/pet"
-	proto "github.com/isd-sgcu/johnjud-go-proto/johnjud/backend/pet/v1"
 	"github.com/stretchr/testify/mock"
 )
 
@@ -30,8 +29,8 @@ func (r *RepositoryMock) Create(in *pet.Pet) error {
 	return args.Error(1)
 }
 
-func (r *RepositoryMock) FindAll(result *[]*pet.Pet, query *proto.FindAllPetRequest) error {
-	args := r.Called(*result, query)
+func (r *RepositoryMock) FindAll(result *[]*pet.Pet) error {
+	args := r.Called(*result)
 
 	if args.Get(0) != nil {
 		*result = *args.Get(0).(*[]*pet.Pet)
