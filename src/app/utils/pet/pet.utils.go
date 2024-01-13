@@ -2,29 +2,25 @@ package pet
 
 import (
 	"errors"
-	"fmt"
 	"strings"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/isd-sgcu/johnjud-backend/src/app/model"
 	"github.com/isd-sgcu/johnjud-backend/src/app/model/pet"
+	"github.com/isd-sgcu/johnjud-backend/src/constant"
 	petConst "github.com/isd-sgcu/johnjud-backend/src/constant/pet"
 	proto "github.com/isd-sgcu/johnjud-go-proto/johnjud/backend/pet/v1"
 	imageProto "github.com/isd-sgcu/johnjud-go-proto/johnjud/file/image/v1"
 	"gorm.io/gorm"
 )
 
-func RawToDtoList(in *[]*pet.Pet, images [][]*imageProto.Image, query *proto.FindAllPetRequest) ([]*proto.Pet, error) {
-	var result []*proto.Pet
-	if len(*in) != len(images) {
-		return nil, errors.New("length of in and imageUrls have to be the same")
-	}
-
-	for i, p := range *in {
+func FilterPet(in *[]*pet.Pet, query *proto.FindAllPetRequest) error {
+	var results []*pet.Pet
+	for _, p := range *in {
 		res, err := filterAge(p, query.Age)
 		if err != nil {
-			return nil, err
+			return err
 		}
 		if !res {
 			continue
@@ -47,6 +43,41 @@ func RawToDtoList(in *[]*pet.Pet, images [][]*imageProto.Image, query *proto.Fin
 		if query.Origin != "" && p.Origin != query.Origin {
 			continue
 		}
+		results = append(results, p)
+	}
+	*in = results
+	return nil
+}
+
+func PaginatePets(pets *[]*pet.Pet, page int32, pageSize int32) error {
+	if page <= 0 {
+		page = 1
+	}
+	if pageSize <= 0 {
+		pageSize = 10
+	}
+	start := (page - 1) * pageSize
+	end := start + pageSize
+
+	if start > int32(len(*pets)) {
+		*pets = []*pet.Pet{}
+		return nil
+	}
+	if end > int32(len(*pets)) {
+		end = int32(len(*pets))
+	}
+	*pets = (*pets)[start:end]
+	return nil
+}
+
+func RawToDtoList(in *[]*pet.Pet, images [][]*imageProto.Image, query *proto.FindAllPetRequest) ([]*proto.Pet, error) {
+	var result []*proto.Pet
+	if len(*in) != len(images) {
+		return nil, errors.New("length of in and imageUrls have to be the same")
+	}
+
+	for i, p := range *in {
+		// TODO: create new filter image function this wont work
 		result = append(result, RawToDto(p, images[i]))
 	}
 	return result, nil
@@ -155,9 +186,8 @@ func filterAge(pet *pet.Pet, age string) (bool, error) {
 
 	currYear := time.Now()
 	birthYear := birthdate
-	diff := currYear.Sub(birthYear).Hours() / petConst.HOUR / petConst.YEAR
+	diff := currYear.Sub(birthYear).Hours() / constant.DAY / constant.YEAR
 
-	fmt.Println(age, diff, currYear.Year()-birthYear.Year())
 	switch age {
 	case "kitten":
 		return diff < 1, nil
@@ -166,6 +196,6 @@ func filterAge(pet *pet.Pet, age string) (bool, error) {
 	case "senior":
 		return diff >= 7, nil
 	default:
-		return false, errors.New("filter age error. your age must be 'kitten' | 'adult' | 'senior' ")
+		return true, nil
 	}
 }
