@@ -3,7 +3,6 @@ package pet
 import (
 	"context"
 	"errors"
-	"fmt"
 	"math/rand"
 	"testing"
 	"time"
@@ -357,10 +356,6 @@ func (t *PetServiceTest) TestFindAllSuccess() {
 	srv := NewService(repo, imgSrv)
 
 	actual, err := srv.FindAll(context.Background(), t.FindAllPetReqMock)
-	fmt.Println("err: ", err)
-	_ = actual
-	_ = err
-	fmt.Println(actual)
 	assert.Nil(t.T(), err)
 	assert.Equal(t.T(), want, actual)
 }
