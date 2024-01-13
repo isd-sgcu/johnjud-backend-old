@@ -2,6 +2,7 @@ package pet
 
 import (
 	"errors"
+	"math"
 	"strings"
 	"time"
 
@@ -25,7 +26,7 @@ func FilterPet(in *[]*pet.Pet, query *proto.FindAllPetRequest) error {
 		if !res {
 			continue
 		}
-		if query.Search != "" && !strings.Contains(p.Name, query.Search) && !strings.Contains(p.Species, query.Search) {
+		if query.Search != "" && !strings.Contains(p.Name, query.Search) {
 			continue
 		}
 		if query.Type != "" && p.Type != query.Type {
@@ -49,24 +50,30 @@ func FilterPet(in *[]*pet.Pet, query *proto.FindAllPetRequest) error {
 	return nil
 }
 
-func PaginatePets(pets *[]*pet.Pet, page int32, pageSize int32) error {
+func PaginatePets(pets *[]*pet.Pet, page int32, pageSize int32, metadata *proto.FindAllPetMetaData) error {
+	totalsPets := int32(len(*pets))
 	if page <= 0 {
 		page = 1
 	}
 	if pageSize <= 0 {
-		pageSize = 10
+		pageSize = totalsPets
 	}
 	start := (page - 1) * pageSize
 	end := start + pageSize
 
-	if start > int32(len(*pets)) {
+	if start > totalsPets {
 		*pets = []*pet.Pet{}
 		return nil
 	}
-	if end > int32(len(*pets)) {
-		end = int32(len(*pets))
+	if end > totalsPets {
+		end = totalsPets
 	}
 	*pets = (*pets)[start:end]
+
+	metadata.Page = page
+	metadata.PageSize = pageSize
+	metadata.Total = totalsPets
+	metadata.TotalPages = int32(math.Ceil(float64(totalsPets / pageSize)))
 	return nil
 }
 
@@ -87,7 +94,6 @@ func RawToDto(in *pet.Pet, images []*imageProto.Image) *proto.Pet {
 	return &proto.Pet{
 		Id:           in.ID.String(),
 		Type:         in.Type,
-		Species:      in.Species,
 		Name:         in.Name,
 		Birthdate:    in.Birthdate,
 		Gender:       string(in.Gender),
@@ -100,7 +106,6 @@ func RawToDto(in *pet.Pet, images []*imageProto.Image) *proto.Pet {
 		IsSterile:    in.IsSterile,
 		IsVaccinated: in.IsVaccinated,
 		IsVisible:    in.IsVisible,
-		IsClubPet:    in.IsClubPet,
 		Origin:       in.Origin,
 		Address:      in.Address,
 		Contact:      in.Contact,
@@ -142,7 +147,6 @@ func DtoToRaw(in *proto.Pet) (res *pet.Pet, err error) {
 			DeletedAt: gorm.DeletedAt{},
 		},
 		Type:         in.Type,
-		Species:      in.Species,
 		Name:         in.Name,
 		Birthdate:    in.Birthdate,
 		Gender:       gender,
@@ -154,7 +158,6 @@ func DtoToRaw(in *proto.Pet) (res *pet.Pet, err error) {
 		IsSterile:    in.IsSterile,
 		IsVaccinated: in.IsVaccinated,
 		IsVisible:    in.IsVisible,
-		IsClubPet:    in.IsClubPet,
 		Origin:       in.Origin,
 		Address:      in.Address,
 		Contact:      in.Contact,
