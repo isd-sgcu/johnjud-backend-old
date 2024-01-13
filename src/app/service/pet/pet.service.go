@@ -89,6 +89,7 @@ func (s *Service) ChangeView(_ context.Context, req *proto.ChangeViewPetRequest)
 func (s *Service) FindAll(_ context.Context, req *proto.FindAllPetRequest) (res *proto.FindAllPetResponse, err error) {
 	var pets []*pet.Pet
 	var imagesList [][]*image_proto.Image
+	var metaData *proto.FindAllPetMetaData
 
 	err = s.repository.FindAll(&pets)
 	if err != nil {
@@ -97,7 +98,7 @@ func (s *Service) FindAll(_ context.Context, req *proto.FindAllPetRequest) (res 
 	}
 
 	petUtils.FilterPet(&pets, req)
-	petUtils.PaginatePets(&pets, req.Page, req.PageSize)
+	petUtils.PaginatePets(&pets, req.Page, req.PageSize, metaData)
 
 	for _, pet := range pets {
 		images, err := s.imageService.FindByPetId(pet.ID.String())
@@ -110,7 +111,7 @@ func (s *Service) FindAll(_ context.Context, req *proto.FindAllPetRequest) (res 
 	if err != nil {
 		return nil, status.Error(codes.Internal, fmt.Sprintf("error converting raw to dto list: %v", err))
 	}
-	return &proto.FindAllPetResponse{Pets: petWithImages}, nil
+	return &proto.FindAllPetResponse{Pets: petWithImages, Metadata: metaData}, nil
 }
 
 func (s Service) FindOne(_ context.Context, req *proto.FindOnePetRequest) (res *proto.FindOnePetResponse, err error) {
