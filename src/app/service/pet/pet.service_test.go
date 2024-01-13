@@ -314,7 +314,15 @@ func (t *PetServiceTest) TestFindOneSuccess() {
 
 func (t *PetServiceTest) TestFindAllSuccess() {
 
-	want := &proto.FindAllPetResponse{Pets: t.createPetsDto(t.Pets, t.ImagesList)}
+	want := &proto.FindAllPetResponse{
+		Pets: t.createPetsDto(t.Pets, t.ImagesList),
+		Metadata: &proto.FindAllPetMetaData{
+			Page:       1,
+			TotalPages: 1,
+			PageSize:   int32(len(t.Pets)),
+			Total:      int32(len(t.Pets)),
+		},
+	}
 
 	var petsIn []*pet.Pet
 
@@ -329,7 +337,6 @@ func (t *PetServiceTest) TestFindAllSuccess() {
 	srv := NewService(repo, imgSrv)
 
 	actual, err := srv.FindAll(context.Background(), &proto.FindAllPetRequest{})
-
 	assert.Nil(t.T(), err)
 	assert.Equal(t.T(), want, actual)
 }
