@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"net"
 	"os"
@@ -17,6 +18,7 @@ import (
 	petSrv "github.com/isd-sgcu/johnjud-backend/src/app/service/pet"
 	"github.com/isd-sgcu/johnjud-backend/src/config"
 	"github.com/isd-sgcu/johnjud-backend/src/database"
+	seed "github.com/isd-sgcu/johnjud-backend/src/database/seeds"
 	likePb "github.com/isd-sgcu/johnjud-go-proto/johnjud/backend/like/v1"
 	petPb "github.com/isd-sgcu/johnjud-go-proto/johnjud/backend/pet/v1"
 	imagePb "github.com/isd-sgcu/johnjud-go-proto/johnjud/file/image/v1"
@@ -26,7 +28,26 @@ import (
 	"google.golang.org/grpc/health"
 	"google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
+	"gorm.io/gorm"
 )
+
+func handleArgs(db *gorm.DB) {
+	flag.Parse()
+	args := flag.Args()
+
+	if len(args) >= 1 {
+		switch args[0] {
+		case "seed":
+			err := seed.Execute(db, args[1:]...)
+			if err != nil {
+				log.Fatal().
+					Str("service", "seeder").
+					Msg("Not found seed")
+			}
+			os.Exit(0)
+		}
+	}
+}
 
 type operation func(ctx context.Context) error
 
@@ -100,6 +121,8 @@ func main() {
 			Str("service", "backend").
 			Msg("Failed to init postgres connection")
 	}
+
+	handleArgs(db)
 
 	fileConn, err := grpc.Dial(conf.Service.File, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
