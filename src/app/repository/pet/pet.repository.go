@@ -15,22 +15,6 @@ func NewRepository(db *gorm.DB) *Repository {
 
 func (r *Repository) FindAll(result *[]*pet.Pet) error {
 	return r.db.Model(&pet.Pet{}).Find(result).Error
-	/*
-		err := r.db.Model(&pet.Pet{}).Find(result).Error
-		if err != nil {
-			return err
-		}
-
-		err = petUtils.FilterPet(result, query)
-		if err != nil {
-			return err
-		}
-		err = petUtils.PaginatePets(result, query.Page, query.PageSize)
-		if err != nil {
-			return err
-		}
-		return nil
-	*/
 }
 
 func (r *Repository) FindOne(id string, result *pet.Pet) error {
