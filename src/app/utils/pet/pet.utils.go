@@ -70,10 +70,12 @@ func PaginatePets(pets *[]*pet.Pet, page int32, pageSize int32, metadata *proto.
 	}
 	*pets = (*pets)[start:end]
 
+	totalPages := int32(math.Ceil(float64(totalsPets) / float64(pageSize)))
+
 	metadata.Page = page
 	metadata.PageSize = pageSize
 	metadata.Total = totalsPets
-	metadata.TotalPages = int32(math.Ceil(float64(totalsPets / pageSize)))
+	metadata.TotalPages = totalPages
 	return nil
 }
 
