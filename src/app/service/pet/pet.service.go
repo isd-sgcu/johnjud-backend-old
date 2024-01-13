@@ -22,11 +22,11 @@ type Service struct {
 }
 
 type IRepository interface {
-	FindAll(result *[]*pet.Pet) error
-	FindOne(id string, result *pet.Pet) error
-	Create(in *pet.Pet) error
-	Update(id string, result *pet.Pet) error
-	Delete(id string) error
+	FindAll(*[]*pet.Pet, *proto.FindAllPetRequest) error
+	FindOne(string, *pet.Pet) error
+	Create(*pet.Pet) error
+	Update(string, *pet.Pet) error
+	Delete(string) error
 }
 
 type ImageService interface {
@@ -90,7 +90,7 @@ func (s *Service) FindAll(_ context.Context, req *proto.FindAllPetRequest) (res 
 	var pets []*pet.Pet
 	var imagesList [][]*image_proto.Image
 
-	err = s.repository.FindAll(&pets)
+	err = s.repository.FindAll(&pets, req)
 	if err != nil {
 		log.Error().Err(err).Str("service", "event").Str("module", "find all").Msg("Error while querying all events")
 		return nil, status.Error(codes.Unavailable, "Internal error")
@@ -103,7 +103,6 @@ func (s *Service) FindAll(_ context.Context, req *proto.FindAllPetRequest) (res 
 		}
 		imagesList = append(imagesList, images)
 	}
-	fmt.Println(req)
 	petWithImages, err := petUtils.RawToDtoList(&pets, imagesList, req)
 	if err != nil {
 		return nil, status.Error(codes.Internal, fmt.Sprintf("error converting raw to dto list: %v", err))
