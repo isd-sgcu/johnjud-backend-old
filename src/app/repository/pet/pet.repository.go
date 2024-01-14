@@ -1,6 +1,8 @@
 package pet
 
 import (
+	"errors"
+
 	"github.com/isd-sgcu/johnjud-backend/src/app/model/pet"
 	"gorm.io/gorm"
 )
@@ -30,5 +32,13 @@ func (r *Repository) Update(id string, result *pet.Pet) error {
 }
 
 func (r *Repository) Delete(id string) error {
-	return r.db.Where("id = ?", id).Delete(&pet.Pet{}).Error
+	var pet pet.Pet
+	err := r.db.Where("id = ? AND deleted_at IS NULL", id).First(&pet).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return gorm.ErrRecordNotFound
+		}
+		return err
+	}
+	return r.db.Delete(&pet).Error
 }
