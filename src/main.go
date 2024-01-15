@@ -93,7 +93,7 @@ func main() {
 			Msg("Failed to load config")
 	}
 
-	db, err := database.InitPostgresDatabase(&conf.Database, conf.App.Debug)
+	db, err := database.InitPostgresDatabase(&conf.Database, conf.App.IsDevelopment())
 	if err != nil {
 		log.Fatal().
 			Err(err).
