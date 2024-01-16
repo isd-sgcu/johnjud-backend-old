@@ -1,50 +1,65 @@
 package config
 
 import (
-	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 )
 
 type Database struct {
-	Host     string `mapstructure:"host"`
-	Port     int    `mapstructure:"port"`
-	Name     string `mapstructure:"name"`
-	Username string `mapstructure:"username"`
-	Password string `mapstructure:"password"`
-	SSL      string `mapstructure:"ssl"`
+	Url string `mapstructure:"URL"`
 }
 
 type App struct {
-	Port  int  `mapstructure:"port"`
-	Debug bool `mapstructure:"debug"`
+	Port int    `mapstructure:"PORT"`
+	Env  string `mapstructure:"ENV"`
 }
 
 type Service struct {
-	File string `mapstructure:"file"`
+	File string `mapstructure:"FILE"`
 }
 
 type Config struct {
-	App      App      `mapstructure:"app"`
-	Database Database `mapstructure:"database"`
-	Service  Service  `mapstructure:"service"`
+	App      App
+	Database Database
+	Service  Service
 }
 
-func LoadConfig() (config *Config, err error) {
-	viper.AddConfigPath("./config")
-	viper.SetConfigName("config")
-	viper.SetConfigType("yaml")
-
-	viper.AutomaticEnv()
-
-	err = viper.ReadInConfig()
-	if err != nil {
-		return nil, errors.Wrap(err, "error occurs while reading the config")
+func LoadConfig() (*Config, error) {
+	dbCfgLdr := viper.New()
+	dbCfgLdr.SetEnvPrefix("DB")
+	dbCfgLdr.AutomaticEnv()
+	dbCfgLdr.AllowEmptyEnv(false)
+	dbConfig := Database{}
+	if err := dbCfgLdr.Unmarshal(&dbConfig); err != nil {
+		return nil, err
 	}
 
-	err = viper.Unmarshal(&config)
-	if err != nil {
-		return nil, errors.Wrap(err, "error occurs while unmarshal the config")
+	appCfgLdr := viper.New()
+	appCfgLdr.SetEnvPrefix("APP")
+	appCfgLdr.AutomaticEnv()
+	dbCfgLdr.AllowEmptyEnv(false)
+	appConfig := App{}
+	if err := appCfgLdr.Unmarshal(&appConfig); err != nil {
+		return nil, err
 	}
 
-	return
+	serviceCfgLdr := viper.New()
+	serviceCfgLdr.SetEnvPrefix("SERVICE")
+	serviceCfgLdr.AutomaticEnv()
+	dbCfgLdr.AllowEmptyEnv(false)
+	serviceConfig := Service{}
+	if err := serviceCfgLdr.Unmarshal(&serviceConfig); err != nil {
+		return nil, err
+	}
+
+	config := &Config{
+		Database: dbConfig,
+		App:      appConfig,
+		Service:  serviceConfig,
+	}
+
+	return config, nil
+}
+
+func (ac *App) IsDevelopment() bool {
+	return ac.Env == "development"
 }

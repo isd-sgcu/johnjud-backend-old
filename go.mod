@@ -7,10 +7,9 @@ toolchain go1.21.5
 require (
 	github.com/bxcodec/faker/v3 v3.8.1
 	github.com/google/uuid v1.5.0
-	github.com/isd-sgcu/johnjud-go-proto v0.0.9
-	github.com/pkg/errors v0.9.1
+	github.com/isd-sgcu/johnjud-go-proto v0.5.0
 	github.com/rs/zerolog v1.31.0
-	github.com/spf13/viper v1.18.2
+	github.com/spf13/viper v1.18.1
 	github.com/stretchr/testify v1.8.4
 	google.golang.org/grpc v1.60.1
 	gorm.io/driver/postgres v1.5.4

@@ -13,4 +13,4 @@ test:
 	go tool cover -html=coverage.out -o coverage.html
 
 server:
-	go run ./src/.
+	. ./tools/export-env.sh ; go run ./src/.
