@@ -7,10 +7,19 @@ services:
     depends_on:
       - local-db
     restart: unless-stopped
-    volumes:
-      - ./config/file:/app/config
+    environment:
+      - APP_PORT=3004
+      - APP_ENV=development
+      - DB_URL=postgres://root:root@johnjud-local-db:5432/johnjud_db
+      - BUCKET_ENDPOINT=BUCKET_ENDPOINT
+      - BUCKET_ACCESS_KEY=BUCKET_ACCESS_KEY
+      - BUCKET_SECRET_KEY=BUCKET_SECRET_KEY
+      - BUCKET_NAME=johnjud-pet-images
+      - BUCKET_USE_SSL=false
     ports:
       - "3004:3004"
+    networks:
+      - johnjud
 
   local-db:
     image: postgres:15.1-alpine3.17
@@ -24,6 +33,10 @@ services:
       - postgres:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    networks:
+      - johnjud
       
 volumes:
   postgres:
+networks:
+  johnjud:
