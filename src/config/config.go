@@ -1,72 +1,20 @@
-// package config
-
-// import (
-// 	"github.com/pkg/errors"
-// 	"github.com/spf13/viper"
-// )
-
-// type Database struct {
-// 	Host     string `mapstructure:"host"`
-// 	Port     int    `mapstructure:"port"`
-// 	Name     string `mapstructure:"name"`
-// 	Username string `mapstructure:"username"`
-// 	Password string `mapstructure:"password"`
-// 	SSL      string `mapstructure:"ssl"`
-// }
-
-// type App struct {
-// 	Port  int  `mapstructure:"port"`
-// 	Debug bool `mapstructure:"debug"`
-// }
-
-// type Service struct {
-// 	File string `mapstructure:"file"`
-// }
-
-// type Config struct {
-// 	App      App      `mapstructure:"app"`
-// 	Database Database `mapstructure:"database"`
-// 	Service  Service  `mapstructure:"service"`
-// }
-
-// func LoadConfig() (config *Config, err error) {
-// 	viper.AddConfigPath("./config")
-// 	viper.SetConfigName("config")
-// 	viper.SetConfigType("yaml")
-
-// 	viper.AutomaticEnv()
-
-// 	err = viper.ReadInConfig()
-// 	if err != nil {
-// 		return nil, errors.Wrap(err, "error occurs while reading the config")
-// 	}
-
-// 	err = viper.Unmarshal(&config)
-// 	if err != nil {
-// 		return nil, errors.Wrap(err, "error occurs while unmarshal the config")
-// 	}
-
-// 	return
-// }
-
 package config
 
 import (
-	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
 )
 
 type Database struct {
-	Url string `mapstructure:"db_url"`
+	Url string `mapstructure:"URL"`
 }
 
 type App struct {
-	Port int    `mapstructure:"app_port"`
-	Env  string `mapstructure:"app_env"`
+	Port int    `mapstructure:"PORT"`
+	Env  string `mapstructure:"ENV"`
 }
 
 type Service struct {
-	File string `mapstructure:"service_file"`
+	File string `mapstructure:"FILE"`
 }
 
 type Config struct {
@@ -76,26 +24,30 @@ type Config struct {
 }
 
 func LoadConfig() (*Config, error) {
-	viper.SetConfigFile(".env")
-	err := viper.ReadInConfig()
-	if err != nil {
-		log.Fatal().Err(err).
-			Str("service", "file").
-			Msg("Failed to load .env file")
-	}
-
-	var dbConfig Database
-	if err := viper.Unmarshal(&dbConfig); err != nil {
+	dbCfgLdr := viper.New()
+	dbCfgLdr.SetEnvPrefix("DB")
+	dbCfgLdr.AutomaticEnv()
+	dbCfgLdr.AllowEmptyEnv(false)
+	dbConfig := Database{}
+	if err := dbCfgLdr.Unmarshal(&dbConfig); err != nil {
 		return nil, err
 	}
 
-	var appConfig App
-	if err := viper.Unmarshal(&appConfig); err != nil {
+	appCfgLdr := viper.New()
+	appCfgLdr.SetEnvPrefix("APP")
+	appCfgLdr.AutomaticEnv()
+	dbCfgLdr.AllowEmptyEnv(false)
+	appConfig := App{}
+	if err := appCfgLdr.Unmarshal(&appConfig); err != nil {
 		return nil, err
 	}
 
-	var serviceConfig Service
-	if err := viper.Unmarshal(&serviceConfig); err != nil {
+	serviceCfgLdr := viper.New()
+	serviceCfgLdr.SetEnvPrefix("SERVICE")
+	serviceCfgLdr.AutomaticEnv()
+	dbCfgLdr.AllowEmptyEnv(false)
+	serviceConfig := Service{}
+	if err := serviceCfgLdr.Unmarshal(&serviceConfig); err != nil {
 		return nil, err
 	}
 

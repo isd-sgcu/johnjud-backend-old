@@ -9,7 +9,7 @@ require (
 	github.com/google/uuid v1.5.0
 	github.com/isd-sgcu/johnjud-go-proto v0.5.0
 	github.com/rs/zerolog v1.31.0
-	github.com/spf13/viper v1.18.2
+	github.com/spf13/viper v1.18.1
 	github.com/stretchr/testify v1.8.4
 	google.golang.org/grpc v1.60.1
 	gorm.io/driver/postgres v1.5.4
