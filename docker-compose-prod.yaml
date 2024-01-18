@@ -1,6 +1,19 @@
 version: "3.9"
 
 services:
+  backend:
+    container_name: johnjud-backend
+    restart: unless-stopped
+    build: .
+    ports:
+      - 3003:3003
+    environment:
+      - APP_PORT=3003
+      - APP_ENV=production
+      - DB_URL=postgres://root:root@johnjud-local-db:5432/johnjud_db
+      - SERVICE_FILE=localhost:3004
+    networks:
+      - johnjud
   local-file:
     image: ghcr.io/isd-sgcu/johnjud-file
     container_name: johnjud-file
@@ -9,7 +22,7 @@ services:
     restart: unless-stopped
     environment:
       - APP_PORT=3004
-      - APP_ENV=development
+      - APP_ENV=production
       - DB_URL=postgres://root:root@johnjud-local-db:5432/johnjud_db
       - BUCKET_ENDPOINT=BUCKET_ENDPOINT
       - BUCKET_ACCESS_KEY=BUCKET_ACCESS_KEY

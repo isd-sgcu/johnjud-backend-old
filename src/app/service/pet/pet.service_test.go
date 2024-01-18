@@ -60,7 +60,6 @@ func (t *PetServiceTest) SetupTest() {
 				DeletedAt: gorm.DeletedAt{},
 			},
 			Type:         faker.Word(),
-			Species:      faker.Word(),
 			Name:         faker.Name(),
 			Birthdate:    faker.Word(),
 			Gender:       genders[rand.Intn(2)],
@@ -72,7 +71,6 @@ func (t *PetServiceTest) SetupTest() {
 			IsSterile:    true,
 			IsVaccinated: true,
 			IsVisible:    true,
-			IsClubPet:    true,
 			Origin:       faker.Paragraph(),
 			Address:      faker.Paragraph(),
 			Contact:      faker.Paragraph(),
@@ -100,7 +98,6 @@ func (t *PetServiceTest) SetupTest() {
 	t.PetDto = &proto.Pet{
 		Id:           t.Pet.ID.String(),
 		Type:         t.Pet.Type,
-		Species:      t.Pet.Species,
 		Name:         t.Pet.Name,
 		Birthdate:    t.Pet.Birthdate,
 		Gender:       string(t.Pet.Gender),
@@ -112,7 +109,6 @@ func (t *PetServiceTest) SetupTest() {
 		IsSterile:    t.Pet.IsSterile,
 		IsVaccinated: t.Pet.IsVaccinated,
 		IsVisible:    t.Pet.IsVisible,
-		IsClubPet:    t.Pet.IsClubPet,
 		Origin:       t.Pet.Origin,
 		Address:      t.Pet.Address,
 		Contact:      t.Pet.Contact,
@@ -127,7 +123,6 @@ func (t *PetServiceTest) SetupTest() {
 			DeletedAt: t.Pet.Base.DeletedAt,
 		},
 		Type:         t.Pet.Type,
-		Species:      t.Pet.Species,
 		Name:         t.Pet.Name,
 		Birthdate:    t.Pet.Birthdate,
 		Gender:       t.Pet.Gender,
@@ -139,7 +134,6 @@ func (t *PetServiceTest) SetupTest() {
 		IsSterile:    t.Pet.IsSterile,
 		IsVaccinated: t.Pet.IsVaccinated,
 		IsVisible:    t.Pet.IsVisible,
-		IsClubPet:    t.Pet.IsClubPet,
 		Origin:       t.Pet.Origin,
 		Address:      t.Pet.Address,
 		Contact:      t.Pet.Contact,
@@ -153,7 +147,6 @@ func (t *PetServiceTest) SetupTest() {
 			DeletedAt: t.Pet.Base.DeletedAt,
 		},
 		Type:         t.Pet.Type,
-		Species:      t.Pet.Species,
 		Name:         t.Pet.Name,
 		Birthdate:    t.Pet.Birthdate,
 		Gender:       t.Pet.Gender,
@@ -165,7 +158,6 @@ func (t *PetServiceTest) SetupTest() {
 		IsSterile:    t.Pet.IsSterile,
 		IsVaccinated: t.Pet.IsVaccinated,
 		IsVisible:    false,
-		IsClubPet:    t.Pet.IsClubPet,
 		Origin:       t.Pet.Origin,
 		Address:      t.Pet.Address,
 		Contact:      t.Pet.Contact,
@@ -174,7 +166,6 @@ func (t *PetServiceTest) SetupTest() {
 	t.CreatePetReqMock = &proto.CreatePetRequest{
 		Pet: &proto.Pet{
 			Type:         t.Pet.Type,
-			Species:      t.Pet.Species,
 			Name:         t.Pet.Name,
 			Birthdate:    t.Pet.Birthdate,
 			Gender:       string(t.Pet.Gender),
@@ -187,7 +178,6 @@ func (t *PetServiceTest) SetupTest() {
 			IsSterile:    t.Pet.IsSterile,
 			IsVaccinated: t.Pet.IsVaccinated,
 			IsVisible:    t.Pet.IsVaccinated,
-			IsClubPet:    t.Pet.IsClubPet,
 			Origin:       t.Pet.Origin,
 			Address:      t.Pet.Address,
 			Contact:      t.Pet.Contact,
@@ -198,7 +188,6 @@ func (t *PetServiceTest) SetupTest() {
 		Pet: &proto.Pet{
 			Id:           t.Pet.ID.String(),
 			Type:         t.Pet.Type,
-			Species:      t.Pet.Species,
 			Name:         t.Pet.Name,
 			Birthdate:    t.Pet.Birthdate,
 			Gender:       string(t.Pet.Gender),
@@ -211,7 +200,6 @@ func (t *PetServiceTest) SetupTest() {
 			IsSterile:    t.Pet.IsSterile,
 			IsVaccinated: t.Pet.IsVaccinated,
 			IsVisible:    t.Pet.IsVisible,
-			IsClubPet:    t.Pet.IsClubPet,
 			Origin:       t.Pet.Origin,
 			Address:      t.Pet.Address,
 			Contact:      t.Pet.Contact,
@@ -231,7 +219,6 @@ func (t *PetServiceTest) SetupTest() {
 			DeletedAt: t.Pet.Base.DeletedAt,
 		},
 		Type:         t.Pet.Type,
-		Species:      t.Pet.Species,
 		Name:         t.Pet.Name,
 		Birthdate:    t.Pet.Birthdate,
 		Gender:       t.Pet.Gender,
@@ -243,7 +230,6 @@ func (t *PetServiceTest) SetupTest() {
 		IsSterile:    t.Pet.IsSterile,
 		IsVaccinated: t.Pet.IsVaccinated,
 		IsVisible:    t.Pet.IsVisible,
-		IsClubPet:    t.Pet.IsClubPet,
 		Origin:       t.Pet.Origin,
 		Address:      t.Pet.Address,
 		Contact:      t.Pet.Contact,
@@ -328,7 +314,15 @@ func (t *PetServiceTest) TestFindOneSuccess() {
 
 func (t *PetServiceTest) TestFindAllSuccess() {
 
-	want := &proto.FindAllPetResponse{Pets: t.createPetsDto(t.Pets, t.ImagesList)}
+	want := &proto.FindAllPetResponse{
+		Pets: t.createPetsDto(t.Pets, t.ImagesList),
+		Metadata: &proto.FindAllPetMetaData{
+			Page:       1,
+			TotalPages: 1,
+			PageSize:   int32(len(t.Pets)),
+			Total:      int32(len(t.Pets)),
+		},
+	}
 
 	var petsIn []*pet.Pet
 
@@ -343,7 +337,6 @@ func (t *PetServiceTest) TestFindAllSuccess() {
 	srv := NewService(repo, imgSrv)
 
 	actual, err := srv.FindAll(context.Background(), &proto.FindAllPetRequest{})
-
 	assert.Nil(t.T(), err)
 	assert.Equal(t.T(), want, actual)
 }
@@ -378,7 +371,6 @@ func createPets() []*pet.Pet {
 				DeletedAt: gorm.DeletedAt{},
 			},
 			Type:         faker.Word(),
-			Species:      faker.Word(),
 			Name:         faker.Name(),
 			Birthdate:    faker.Word(),
 			Gender:       genders[rand.Intn(2)],
@@ -390,7 +382,6 @@ func createPets() []*pet.Pet {
 			IsSterile:    true,
 			IsVaccinated: true,
 			IsVisible:    true,
-			IsClubPet:    true,
 			Origin:       faker.Paragraph(),
 			Address:      faker.Paragraph(),
 			Contact:      faker.Paragraph(),
@@ -408,7 +399,6 @@ func (t *PetServiceTest) createPetsDto(in []*pet.Pet, imagesList [][]*img_proto.
 		r := &proto.Pet{
 			Id:           p.ID.String(),
 			Type:         p.Type,
-			Species:      p.Species,
 			Name:         p.Name,
 			Birthdate:    p.Birthdate,
 			Gender:       string(p.Gender),
@@ -421,7 +411,6 @@ func (t *PetServiceTest) createPetsDto(in []*pet.Pet, imagesList [][]*img_proto.
 			IsSterile:    p.IsSterile,
 			IsVaccinated: p.IsVaccinated,
 			IsVisible:    p.IsVisible,
-			IsClubPet:    p.IsClubPet,
 			Origin:       p.Origin,
 			Address:      p.Address,
 			Contact:      p.Contact,
@@ -441,7 +430,6 @@ func (t *PetServiceTest) TestCreateSuccess() {
 
 	in := &pet.Pet{
 		Type:         t.Pet.Type,
-		Species:      t.Pet.Species,
 		Name:         t.Pet.Name,
 		Birthdate:    t.Pet.Birthdate,
 		Gender:       t.Pet.Gender,
@@ -453,7 +441,6 @@ func (t *PetServiceTest) TestCreateSuccess() {
 		IsSterile:    t.Pet.IsSterile,
 		IsVaccinated: t.Pet.IsVaccinated,
 		IsVisible:    t.Pet.IsVisible,
-		IsClubPet:    t.Pet.IsClubPet,
 		Origin:       t.Pet.Origin,
 		Address:      t.Pet.Address,
 		Contact:      t.Pet.Contact,
@@ -475,7 +462,6 @@ func (t *PetServiceTest) TestCreateInternalErr() {
 
 	in := &pet.Pet{
 		Type:         t.Pet.Type,
-		Species:      t.Pet.Species,
 		Name:         t.Pet.Name,
 		Birthdate:    t.Pet.Birthdate,
 		Gender:       t.Pet.Gender,
@@ -487,7 +473,6 @@ func (t *PetServiceTest) TestCreateInternalErr() {
 		IsSterile:    t.Pet.IsSterile,
 		IsVaccinated: t.Pet.IsVaccinated,
 		IsVisible:    t.Pet.IsVisible,
-		IsClubPet:    t.Pet.IsClubPet,
 		Origin:       t.Pet.Origin,
 		Address:      t.Pet.Address,
 		Contact:      t.Pet.Contact,
