@@ -64,7 +64,6 @@ func (t *PetServiceTest) SetupTest() {
 			Birthdate:    faker.Word(),
 			Gender:       genders[rand.Intn(2)],
 			Color:        faker.Word(),
-			Pattern:      faker.Word(),
 			Habit:        faker.Paragraph(),
 			Caption:      faker.Paragraph(),
 			Status:       statuses[rand.Intn(2)],
@@ -102,7 +101,6 @@ func (t *PetServiceTest) SetupTest() {
 		Birthdate:    t.Pet.Birthdate,
 		Gender:       string(t.Pet.Gender),
 		Color:        t.Pet.Color,
-		Pattern:      t.Pet.Pattern,
 		Habit:        t.Pet.Habit,
 		Caption:      t.Pet.Caption,
 		Status:       string(t.Pet.Status),
@@ -127,7 +125,6 @@ func (t *PetServiceTest) SetupTest() {
 		Birthdate:    t.Pet.Birthdate,
 		Gender:       t.Pet.Gender,
 		Color:        t.Pet.Color,
-		Pattern:      t.Pet.Pattern,
 		Habit:        t.Pet.Habit,
 		Caption:      t.Pet.Caption,
 		Status:       t.Pet.Status,
@@ -146,12 +143,12 @@ func (t *PetServiceTest) SetupTest() {
 			UpdatedAt: t.Pet.Base.UpdatedAt,
 			DeletedAt: t.Pet.Base.DeletedAt,
 		},
-		Type:         t.Pet.Type,
-		Name:         t.Pet.Name,
-		Birthdate:    t.Pet.Birthdate,
-		Gender:       t.Pet.Gender,
-		Color:        t.Pet.Color,
-		Pattern:      t.Pet.Pattern,
+		Type:      t.Pet.Type,
+		Name:      t.Pet.Name,
+		Birthdate: t.Pet.Birthdate,
+		Gender:    t.Pet.Gender,
+		Color:     t.Pet.Color,
+
 		Habit:        t.Pet.Habit,
 		Caption:      t.Pet.Caption,
 		Status:       t.Pet.Status,
@@ -165,12 +162,12 @@ func (t *PetServiceTest) SetupTest() {
 
 	t.CreatePetReqMock = &proto.CreatePetRequest{
 		Pet: &proto.Pet{
-			Type:         t.Pet.Type,
-			Name:         t.Pet.Name,
-			Birthdate:    t.Pet.Birthdate,
-			Gender:       string(t.Pet.Gender),
-			Color:        t.Pet.Color,
-			Pattern:      t.Pet.Pattern,
+			Type:      t.Pet.Type,
+			Name:      t.Pet.Name,
+			Birthdate: t.Pet.Birthdate,
+			Gender:    string(t.Pet.Gender),
+			Color:     t.Pet.Color,
+
 			Habit:        t.Pet.Habit,
 			Caption:      t.Pet.Caption,
 			Status:       string(t.Pet.Status),
@@ -186,13 +183,13 @@ func (t *PetServiceTest) SetupTest() {
 
 	t.UpdatePetReqMock = &proto.UpdatePetRequest{
 		Pet: &proto.Pet{
-			Id:           t.Pet.ID.String(),
-			Type:         t.Pet.Type,
-			Name:         t.Pet.Name,
-			Birthdate:    t.Pet.Birthdate,
-			Gender:       string(t.Pet.Gender),
-			Color:        t.Pet.Color,
-			Pattern:      t.Pet.Pattern,
+			Id:        t.Pet.ID.String(),
+			Type:      t.Pet.Type,
+			Name:      t.Pet.Name,
+			Birthdate: t.Pet.Birthdate,
+			Gender:    string(t.Pet.Gender),
+			Color:     t.Pet.Color,
+
 			Habit:        t.Pet.Habit,
 			Caption:      t.Pet.Caption,
 			Status:       string(t.Pet.Status),
@@ -218,12 +215,12 @@ func (t *PetServiceTest) SetupTest() {
 			UpdatedAt: t.Pet.Base.UpdatedAt,
 			DeletedAt: t.Pet.Base.DeletedAt,
 		},
-		Type:         t.Pet.Type,
-		Name:         t.Pet.Name,
-		Birthdate:    t.Pet.Birthdate,
-		Gender:       t.Pet.Gender,
-		Color:        t.Pet.Color,
-		Pattern:      t.Pet.Pattern,
+		Type:      t.Pet.Type,
+		Name:      t.Pet.Name,
+		Birthdate: t.Pet.Birthdate,
+		Gender:    t.Pet.Gender,
+		Color:     t.Pet.Color,
+
 		Habit:        t.Pet.Habit,
 		Caption:      t.Pet.Caption,
 		Status:       t.Pet.Status,
@@ -375,7 +372,6 @@ func createPets() []*pet.Pet {
 			Birthdate:    faker.Word(),
 			Gender:       genders[rand.Intn(2)],
 			Color:        faker.Word(),
-			Pattern:      faker.Word(),
 			Habit:        faker.Paragraph(),
 			Caption:      faker.Paragraph(),
 			Status:       statuses[rand.Intn(2)],
@@ -397,13 +393,13 @@ func (t *PetServiceTest) createPetsDto(in []*pet.Pet, imagesList [][]*img_proto.
 
 	for i, p := range in {
 		r := &proto.Pet{
-			Id:           p.ID.String(),
-			Type:         p.Type,
-			Name:         p.Name,
-			Birthdate:    p.Birthdate,
-			Gender:       string(p.Gender),
-			Color:        p.Color,
-			Pattern:      p.Pattern,
+			Id:        p.ID.String(),
+			Type:      p.Type,
+			Name:      p.Name,
+			Birthdate: p.Birthdate,
+			Gender:    string(p.Gender),
+			Color:     p.Color,
+
 			Habit:        p.Habit,
 			Caption:      p.Caption,
 			Status:       string(p.Status),
@@ -429,12 +425,12 @@ func (t *PetServiceTest) TestCreateSuccess() {
 	repo := &mock.RepositoryMock{}
 
 	in := &pet.Pet{
-		Type:         t.Pet.Type,
-		Name:         t.Pet.Name,
-		Birthdate:    t.Pet.Birthdate,
-		Gender:       t.Pet.Gender,
-		Color:        t.Pet.Color,
-		Pattern:      t.Pet.Pattern,
+		Type:      t.Pet.Type,
+		Name:      t.Pet.Name,
+		Birthdate: t.Pet.Birthdate,
+		Gender:    t.Pet.Gender,
+		Color:     t.Pet.Color,
+
 		Habit:        t.Pet.Habit,
 		Caption:      t.Pet.Caption,
 		Status:       t.Pet.Status,
@@ -461,12 +457,12 @@ func (t *PetServiceTest) TestCreateInternalErr() {
 	repo := &mock.RepositoryMock{}
 
 	in := &pet.Pet{
-		Type:         t.Pet.Type,
-		Name:         t.Pet.Name,
-		Birthdate:    t.Pet.Birthdate,
-		Gender:       t.Pet.Gender,
-		Color:        t.Pet.Color,
-		Pattern:      t.Pet.Pattern,
+		Type:      t.Pet.Type,
+		Name:      t.Pet.Name,
+		Birthdate: t.Pet.Birthdate,
+		Gender:    t.Pet.Gender,
+		Color:     t.Pet.Color,
+
 		Habit:        t.Pet.Habit,
 		Caption:      t.Pet.Caption,
 		Status:       t.Pet.Status,
