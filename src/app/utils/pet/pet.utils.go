@@ -17,9 +17,12 @@ import (
 )
 
 func FilterPet(in *[]*pet.Pet, query *proto.FindAllPetRequest) error {
+	if query.MaxAge == 0 {
+		query.MaxAge = math.MaxInt32
+	}
 	var results []*pet.Pet
 	for _, p := range *in {
-		res, err := filterAge(p, query.Age)
+		res, err := filterAge(p, query.MinAge, query.MaxAge)
 		if err != nil {
 			return err
 		}
@@ -36,9 +39,6 @@ func FilterPet(in *[]*pet.Pet, query *proto.FindAllPetRequest) error {
 			continue
 		}
 		if query.Color != "" && p.Color != query.Color {
-			continue
-		}
-		if query.Pattern != "" && p.Pattern != query.Pattern {
 			continue
 		}
 		if query.Origin != "" && p.Origin != query.Origin {
@@ -100,7 +100,6 @@ func RawToDto(in *pet.Pet, images []*imageProto.Image) *proto.Pet {
 		Birthdate:    in.Birthdate,
 		Gender:       string(in.Gender),
 		Color:        in.Color,
-		Pattern:      in.Pattern,
 		Habit:        in.Habit,
 		Caption:      in.Caption,
 		Status:       string(in.Status),
@@ -153,7 +152,6 @@ func DtoToRaw(in *proto.Pet) (res *pet.Pet, err error) {
 		Birthdate:    in.Birthdate,
 		Gender:       gender,
 		Color:        in.Color,
-		Pattern:      in.Pattern,
 		Habit:        in.Habit,
 		Caption:      in.Caption,
 		Status:       status,
@@ -183,7 +181,7 @@ func parseDate(dateStr string) (time.Time, error) {
 	return parsedTime, nil
 }
 
-func filterAge(pet *pet.Pet, age string) (bool, error) {
+func filterAge(pet *pet.Pet, minAge, maxAge int32) (bool, error) {
 	birthdate, err := parseDate(pet.Birthdate)
 	if err != nil {
 		return false, err
@@ -193,14 +191,5 @@ func filterAge(pet *pet.Pet, age string) (bool, error) {
 	birthYear := birthdate
 	diff := currYear.Sub(birthYear).Hours() / constant.DAY / constant.YEAR
 
-	switch age {
-	case "kitten":
-		return diff < 1, nil
-	case "adult":
-		return diff >= 1 && diff < 7, nil
-	case "senior":
-		return diff >= 7, nil
-	default:
-		return true, nil
-	}
+	return diff >= float64(minAge) && diff <= float64(maxAge), nil
 }
