@@ -9,7 +9,7 @@ var pets = []pet.Pet{
 	{
 		Type:         "แมว",
 		Name:         "เต้าเจี้ยว",
-		Birthdate:    "4 July 2023",
+		Birthdate:    "2023-07-04 00:00:00.000000",
 		Gender:       constant.MALE,
 		Color:        "ครีม",
 		Pattern:      "สีล้วน",
@@ -26,7 +26,7 @@ var pets = []pet.Pet{
 	}, {
 		Type:         "แมว",
 		Name:         "ซีอิ๊ว",
-		Birthdate:    "4 July 2023",
+		Birthdate:    "2023-07-04 00:00:00.000000",
 		Gender:       constant.FEMALE,
 		Color:        "ดำ",
 		Pattern:      "สีล้วน",
@@ -43,7 +43,7 @@ var pets = []pet.Pet{
 	}, {
 		Type:         "แมว",
 		Name:         "พัดพา",
-		Birthdate:    "18 June 2023",
+		Birthdate:    "2023-06-18 00:00:00.000000",
 		Gender:       constant.FEMALE,
 		Color:        "เทา",
 		Pattern:      "สลิด",
@@ -60,7 +60,7 @@ var pets = []pet.Pet{
 	}, {
 		Type:         "แมว",
 		Name:         "โอริโอ้",
-		Birthdate:    "20 December 2022",
+		Birthdate:    "2022-12-20 00:00:00.000000",
 		Gender:       constant.MALE,
 		Color:        "ดำ",
 		Pattern:      "สีล้วน",
@@ -77,7 +77,7 @@ var pets = []pet.Pet{
 	}, {
 		Type:         "แมว",
 		Name:         "แม่พลอย",
-		Birthdate:    "18 July 2017",
+		Birthdate:    "2017-07-18 00:00:00.000000",
 		Gender:       constant.FEMALE,
 		Color:        "เทา",
 		Pattern:      "สลิด",
@@ -94,7 +94,7 @@ var pets = []pet.Pet{
 	}, {
 		Type:         "แมว",
 		Name:         "แมงมุม",
-		Birthdate:    "6 September 2023",
+		Birthdate:    "2023-09-06 00:00:00.000000",
 		Gender:       constant.MALE,
 		Color:        "น้ำตาล",
 		Pattern:      "สีล้วน",
@@ -111,7 +111,7 @@ var pets = []pet.Pet{
 	}, {
 		Type:         "แมว",
 		Name:         "ลูกหม่อน",
-		Birthdate:    "18 August 2023",
+		Birthdate:    "2023-08-18 00:00:00.000000",
 		Gender:       constant.FEMALE,
 		Color:        "น้ำตาล",
 		Pattern:      "เปรอะ",
@@ -128,7 +128,7 @@ var pets = []pet.Pet{
 	}, {
 		Type:         "แมว",
 		Name:         "ซาบะ",
-		Birthdate:    "18 June 2023",
+		Birthdate:    "2023-06-18 00:00:00.000000",
 		Gender:       constant.FEMALE,
 		Color:        "เทา",
 		Pattern:      "สลิด",
@@ -145,7 +145,7 @@ var pets = []pet.Pet{
 	}, {
 		Type:         "แมว",
 		Name:         "มีจ้า",
-		Birthdate:    "4 September 2023",
+		Birthdate:    "2023-09-04 00:00:00.000000",
 		Gender:       constant.MALE,
 		Color:        "น้ำตาล",
 		Pattern:      "สีล้วน",
@@ -162,7 +162,7 @@ var pets = []pet.Pet{
 	}, {
 		Type:         "แมว",
 		Name:         "หวานเจี๊ยบ",
-		Birthdate:    "4 September 2023",
+		Birthdate:    "2023-09-04 00:00:00.000000",
 		Gender:       constant.FEMALE,
 		Color:        "ดำ",
 		Pattern:      "ทักซิโด้",
@@ -179,7 +179,7 @@ var pets = []pet.Pet{
 	}, {
 		Type:         "แมว",
 		Name:         "วินนี่",
-		Birthdate:    "4 October 2023",
+		Birthdate:    "2023-10-04 00:00:00.000000",
 		Gender:       constant.FEMALE,
 		Color:        "ดำ",
 		Pattern:      "สีล้วน",
@@ -196,7 +196,7 @@ var pets = []pet.Pet{
 	}, {
 		Type:         "แมว",
 		Name:         "มะกอก & มะกรูด",
-		Birthdate:    "18 June 2023",
+		Birthdate:    "2023-06-18 00:00:00.000000",
 		Gender:       constant.MALE,
 		Color:        "เทา",
 		Pattern:      "สลิด",
@@ -213,7 +213,7 @@ var pets = []pet.Pet{
 	}, {
 		Type:         "แมว",
 		Name:         "น้องมอม",
-		Birthdate:    "18 January 2022",
+		Birthdate:    "2022-01-18 00:00:00.000000",
 		Gender:       constant.FEMALE,
 		Color:        "เทา",
 		Pattern:      "สลิด",
@@ -230,7 +230,7 @@ var pets = []pet.Pet{
 	}, {
 		Type:         "แมว",
 		Name:         "น้องเด็กหรือแมวเด็ก",
-		Birthdate:    "4 June 2023",
+		Birthdate:    "2023-06-04 00:00:00.000000",
 		Gender:       constant.FEMALE,
 		Color:        "น้ำตาล",
 		Pattern:      "เปรอะ",
@@ -247,7 +247,7 @@ var pets = []pet.Pet{
 	}, {
 		Type:         "แมว",
 		Name:         "น้องเล็ก",
-		Birthdate:    "4 June 2023",
+		Birthdate:    "2023-06-04 00:00:00.000000",
 		Gender:       constant.MALE,
 		Color:        "เทา",
 		Pattern:      "สลิด",
@@ -264,7 +264,7 @@ var pets = []pet.Pet{
 	}, {
 		Type:         "แมว",
 		Name:         "หนิงหนิง",
-		Birthdate:    "18 August 2023",
+		Birthdate:    "2023-08-18 00:00:00.000000",
 		Gender:       constant.MALE,
 		Color:        "นวล",
 		Pattern:      "สลิด",
