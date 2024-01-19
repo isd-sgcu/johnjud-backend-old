@@ -14,3 +14,6 @@ test:
 
 server:
 	. ./tools/export-env.sh ; go run ./src/.
+
+seed:
+	. ./tools/export-env.sh ; go run ./src/. seed
