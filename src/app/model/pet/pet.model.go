@@ -12,7 +12,6 @@ type Pet struct {
 	Birthdate    string     `json:"birthdate" gorm:"tinytext"`
 	Gender       pet.Gender `json:"gender" gorm:"tinytext" example:"male"`
 	Color        string     `json:"color" gorm:"tinytext"`
-	Pattern      string     `json:"pattern" gorm:"tinytext"`
 	Habit        string     `json:"habit" gorm:"mediumtext"`
 	Caption      string     `json:"caption" gorm:"mediumtext"`
 	Status       pet.Status `json:"status" gorm:"mediumtext" example:"findhome"`
