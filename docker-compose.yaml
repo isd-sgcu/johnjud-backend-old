@@ -15,7 +15,7 @@ services:
       - BUCKET_ACCESS_KEY=BUCKET_ACCESS_KEY
       - BUCKET_SECRET_KEY=BUCKET_SECRET_KEY
       - BUCKET_NAME=johnjud-pet-images
-      - BUCKET_USE_SSL=false
+      - BUCKET_USE_SSL=true
     ports:
       - "3004:3004"
     networks:

@@ -173,6 +173,14 @@ func ExtractImageUrls(in []*imageProto.Image) []string {
 	return result
 }
 
+func ExtractImageIDs(in []*imageProto.Image) []string {
+	var result []string
+	for _, e := range in {
+		result = append(result, e.Id)
+	}
+	return result
+}
+
 func parseDate(dateStr string) (time.Time, error) {
 	parsedTime, err := time.Parse(time.RFC3339, dateStr)
 	if err != nil {
