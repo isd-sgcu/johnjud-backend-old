@@ -31,6 +31,7 @@ type IRepository interface {
 
 type ImageService interface {
 	FindByPetId(petId string) ([]*image_proto.Image, error)
+	AssignPet(petId string, imageIds []string) error
 }
 
 func NewService(repository IRepository, imageService ImageService) *Service {
@@ -138,11 +139,20 @@ func (s *Service) Create(_ context.Context, req *proto.CreatePetRequest) (res *p
 		return nil, status.Error(codes.Internal, "error converting dto to raw: "+err.Error())
 	}
 
-	images := []*image_proto.Image{}
-
 	err = s.repository.Create(raw)
 	if err != nil {
 		return nil, status.Error(codes.Internal, "failed to create pet")
+	}
+
+	imageIds := petUtils.ExtractImageIDs(req.Pet.Images)
+	err = s.imageService.AssignPet(raw.ID.String(), imageIds)
+	if err != nil {
+		return nil, status.Error(codes.Internal, "failed to assign pet to images")
+	}
+
+	images, err := s.imageService.FindByPetId(raw.ID.String())
+	if err != nil {
+		return nil, status.Error(codes.Internal, "error finding images by pet id")
 	}
 
 	return &proto.CreatePetResponse{Pet: petUtils.RawToDto(raw, images)}, nil

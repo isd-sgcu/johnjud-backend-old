@@ -420,7 +420,7 @@ func (t *PetServiceTest) createPetsDto(in []*pet.Pet, imagesList [][]*img_proto.
 
 func (t *PetServiceTest) TestCreateSuccess() {
 	want := &proto.CreatePetResponse{Pet: t.PetDto}
-	want.Pet.Images = []*img_proto.Image{} // when pet is first created, it has no images
+	want.Pet.Images = t.Images
 
 	repo := &mock.RepositoryMock{}
 
@@ -444,6 +444,11 @@ func (t *PetServiceTest) TestCreateSuccess() {
 
 	repo.On("Create", in).Return(t.Pet, nil)
 	imgSrv := new(img_mock.ServiceMock)
+
+	imageIds := []string{t.CreatePetReqMock.Pet.Images[0].Id, t.CreatePetReqMock.Pet.Images[1].Id, t.CreatePetReqMock.Pet.Images[2].Id}
+	imgSrv.On("AssignPet", t.Pet.ID.String(), imageIds).Return(nil)
+
+	imgSrv.On("FindByPetId", t.Pet.ID.String()).Return(t.Images, nil)
 
 	srv := NewService(repo, imgSrv)
 
