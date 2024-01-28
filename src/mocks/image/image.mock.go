@@ -69,5 +69,5 @@ func (c *ServiceMock) FindByPetId(petId string) (res []*proto.Image, err error) 
 func (c *ServiceMock) AssignPet(petId string, imageIds []string) (err error) {
 	args := c.Called(petId, imageIds)
 
-	return args.Error(1)
+	return args.Error(0)
 }
