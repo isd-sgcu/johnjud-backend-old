@@ -3,6 +3,7 @@ package pet
 import (
 	"errors"
 	"math"
+	"reflect"
 	"strings"
 	"time"
 
@@ -179,6 +180,23 @@ func ExtractImageIDs(in []*imageProto.Image) []string {
 		result = append(result, e.Id)
 	}
 	return result
+}
+
+func UpdateMap(in *pet.Pet) map[string]interface{} {
+	updateMap := make(map[string]interface{})
+	t := reflect.TypeOf(*in)
+	for i := 0; i < t.NumField(); i++ {
+		field := t.Field(i)
+		typeName := field.Type.Name()
+		value := reflect.ValueOf(*in).Field(i).Interface()
+		if typeName == "string" && value != "" {
+			updateMap[field.Name] = value
+		}
+		if typeName == "bool" {
+			updateMap[field.Name] = value
+		}
+	}
+	return updateMap
 }
 
 func parseDate(dateStr string) (time.Time, error) {

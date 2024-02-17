@@ -16,7 +16,7 @@ type Pet struct {
 	Caption      string     `json:"caption" gorm:"mediumtext"`
 	Status       pet.Status `json:"status" gorm:"mediumtext" example:"findhome"`
 	IsSterile    bool       `json:"is_sterile"`
-	IsVaccinated bool       `json:"is_vaccine"`
+	IsVaccinated bool       `json:"is_vaccinated"`
 	IsVisible    bool       `json:"is_visible"`
 	Origin       string     `json:"origin" gorm:"tinytext"`
 	Address      string     `json:"address" gorm:"tinytext"`

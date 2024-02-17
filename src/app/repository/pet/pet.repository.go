@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/isd-sgcu/johnjud-backend/src/app/model/pet"
+	petUtils "github.com/isd-sgcu/johnjud-backend/src/app/utils/pet"
 	"gorm.io/gorm"
 )
 
@@ -28,7 +29,8 @@ func (r *Repository) Create(in *pet.Pet) error {
 }
 
 func (r *Repository) Update(id string, result *pet.Pet) error {
-	return r.db.Where(id, "id = ?", id).Updates(&result).First(&result, "id = ?", id).Error
+	updateMap := petUtils.UpdateMap(result)
+	return r.db.Model(&result).Updates(updateMap).First(&result, "id = ?", id).Error
 }
 
 func (r *Repository) Delete(id string) error {
