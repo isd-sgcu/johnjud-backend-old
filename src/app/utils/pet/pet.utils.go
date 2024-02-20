@@ -189,7 +189,7 @@ func UpdateMap(in *pet.Pet) map[string]interface{} {
 		field := t.Field(i)
 		typeName := field.Type.Name()
 		value := reflect.ValueOf(*in).Field(i).Interface()
-		if typeName == "string" && value != "" {
+		if (typeName == "string" || typeName == "Gender" || typeName == "Status") && value != "" {
 			updateMap[field.Name] = value
 		}
 		if typeName == "bool" {
