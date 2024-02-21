@@ -80,15 +80,15 @@ func PaginatePets(pets *[]*pet.Pet, page int32, pageSize int32, metadata *proto.
 	return nil
 }
 
-func RawToDtoList(in *[]*pet.Pet, images [][]*imageProto.Image, query *proto.FindAllPetRequest) ([]*proto.Pet, error) {
+func RawToDtoList(in *[]*pet.Pet, images map[string][]*imageProto.Image, query *proto.FindAllPetRequest) ([]*proto.Pet, error) {
 	var result []*proto.Pet
 	if len(*in) != len(images) {
 		return nil, errors.New("length of in and imageUrls have to be the same")
 	}
 
-	for i, p := range *in {
+	for _, p := range *in {
 		// TODO: create new filter image function this wont work
-		result = append(result, RawToDto(p, images[i]))
+		result = append(result, RawToDto(p, images[p.ID.String()]))
 	}
 	return result, nil
 }

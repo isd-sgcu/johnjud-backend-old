@@ -90,7 +90,7 @@ func (s *Service) ChangeView(_ context.Context, req *proto.ChangeViewPetRequest)
 
 func (s *Service) FindAll(_ context.Context, req *proto.FindAllPetRequest) (res *proto.FindAllPetResponse, err error) {
 	var pets []*pet.Pet
-	var imagesList [][]*image_proto.Image
+	imagesList := make(map[string][]*image_proto.Image)
 	metaData := proto.FindAllPetMetaData{}
 
 	err = s.repository.FindAll(&pets, req.IsAdmin)
@@ -107,7 +107,7 @@ func (s *Service) FindAll(_ context.Context, req *proto.FindAllPetRequest) (res 
 		if err != nil {
 			return nil, status.Error(codes.Internal, "error querying image service")
 		}
-		imagesList = append(imagesList, images)
+		imagesList[pet.ID.String()] = images
 	}
 	petWithImages, err := petUtils.RawToDtoList(&pets, imagesList, req)
 	if err != nil {
