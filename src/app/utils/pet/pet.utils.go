@@ -236,6 +236,9 @@ func parseDate(dateStr string) (time.Time, error) {
 }
 
 func filterAge(pet *pet.Pet, minAge, maxAge int32) (bool, error) {
+	log.Info().
+		Str("service", "filterAge").
+		Str("module", "birth").Msgf("birthdate: %s", pet.Birthdate)
 	birthdate, err := parseDate(pet.Birthdate)
 	if err != nil {
 		return false, err
@@ -244,6 +247,9 @@ func filterAge(pet *pet.Pet, minAge, maxAge int32) (bool, error) {
 	currYear := time.Now()
 	birthYear := birthdate
 	diff := currYear.Sub(birthYear).Hours() / constant.DAY / constant.YEAR
+	log.Info().
+		Str("service", "filterAge").
+		Str("module", "FilterAge").Msgf("diff: %f", diff)
 
 	return diff >= float64(minAge) && diff <= float64(maxAge), nil
 }
