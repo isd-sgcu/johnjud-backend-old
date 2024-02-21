@@ -29,7 +29,7 @@ func (r *RepositoryMock) Create(in *pet.Pet) error {
 	return args.Error(1)
 }
 
-func (r *RepositoryMock) FindAll(result *[]*pet.Pet) error {
+func (r *RepositoryMock) FindAll(result *[]*pet.Pet, isAdmin bool) error {
 	args := r.Called(*result)
 
 	if args.Get(0) != nil {

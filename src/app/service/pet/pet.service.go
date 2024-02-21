@@ -12,6 +12,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
 	"gorm.io/gorm"
 )
 
@@ -22,7 +23,7 @@ type Service struct {
 }
 
 type IRepository interface {
-	FindAll(*[]*pet.Pet) error
+	FindAll(*[]*pet.Pet, bool) error
 	FindOne(string, *pet.Pet) error
 	Create(*pet.Pet) error
 	Update(string, *pet.Pet) error
@@ -92,7 +93,7 @@ func (s *Service) FindAll(_ context.Context, req *proto.FindAllPetRequest) (res 
 	var imagesList [][]*image_proto.Image
 	metaData := proto.FindAllPetMetaData{}
 
-	err = s.repository.FindAll(&pets)
+	err = s.repository.FindAll(&pets, req.IsAdmin)
 	if err != nil {
 		log.Error().Err(err).Str("service", "event").Str("module", "find all").Msg("Error while querying all events")
 		return nil, status.Error(codes.Unavailable, "Internal error")

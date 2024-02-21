@@ -16,8 +16,11 @@ func NewRepository(db *gorm.DB) *Repository {
 	return &Repository{db: db}
 }
 
-func (r *Repository) FindAll(result *[]*pet.Pet) error {
-	return r.db.Model(&pet.Pet{}).Find(result).Error
+func (r *Repository) FindAll(result *[]*pet.Pet, isAdmin bool) error {
+	if isAdmin {
+		return r.db.Model(&pet.Pet{}).Find(result).Error
+	}
+	return r.db.Model(&pet.Pet{}).Find(result, "is_visible = ?", true).Error
 }
 
 func (r *Repository) FindOne(id string, result *pet.Pet) error {
