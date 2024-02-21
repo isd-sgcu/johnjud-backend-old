@@ -14,10 +14,14 @@ import (
 	petConst "github.com/isd-sgcu/johnjud-backend/src/constant/pet"
 	proto "github.com/isd-sgcu/johnjud-go-proto/johnjud/backend/pet/v1"
 	imageProto "github.com/isd-sgcu/johnjud-go-proto/johnjud/file/image/v1"
+	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
 )
 
 func FilterPet(in *[]*pet.Pet, query *proto.FindAllPetRequest) error {
+	log.Info().
+		Str("service", "filter pet").
+		Str("module", "FilterPet").Msgf("minAge: %d, maxAge: %d", query.MinAge, query.MaxAge)
 	if query.MaxAge == 0 {
 		query.MaxAge = math.MaxInt32
 	}
