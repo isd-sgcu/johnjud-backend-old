@@ -19,12 +19,15 @@ import (
 )
 
 func FilterPet(in *[]*pet.Pet, query *proto.FindAllPetRequest) error {
-	log.Info().
-		Str("service", "filter pet").
-		Str("module", "FilterPet").Msgf("minAge: %d, maxAge: %d", query.MinAge, query.MaxAge)
 	if query.MaxAge == 0 {
 		query.MaxAge = math.MaxInt32
 	}
+	log.Info().
+		Str("service", "filter pet").
+		Str("module", "FilterPet").Msgf("minAge: %d, maxAge: %d", query.MinAge, query.MaxAge)
+	log.Info().
+		Str("service", "filter pet").
+		Str("module", "FilterPet").Interface("query", query).Msgf("query")
 	var results []*pet.Pet
 	for _, p := range *in {
 		res, err := filterAge(p, query.MinAge, query.MaxAge)
@@ -32,23 +35,44 @@ func FilterPet(in *[]*pet.Pet, query *proto.FindAllPetRequest) error {
 			return err
 		}
 		if !res {
+			log.Info().
+				Str("service", "filter pet").
+				Str("module", "FilterPet reject").Msg("age not in range")
 			continue
 		}
 		if query.Search != "" && !strings.Contains(p.Name, query.Search) {
+			log.Info().
+				Str("service", "filter pet").
+				Str("module", "FilterPet reject").Msg("not in search")
 			continue
 		}
 		if query.Type != "" && p.Type != query.Type {
+			log.Info().
+				Str("service", "filter pet").
+				Str("module", "FilterPet reject").Msg("not the type")
 			continue
 		}
 		if query.Gender != "" && p.Gender != petConst.Gender(query.Gender) {
+			log.Info().
+				Str("service", "filter pet").
+				Str("module", "FilterPet reject").Msg("not the gender")
 			continue
 		}
 		if query.Color != "" && p.Color != query.Color {
+			log.Info().
+				Str("service", "filter pet").
+				Str("module", "FilterPet reject").Msg("not the color")
 			continue
 		}
 		if query.Origin != "" && p.Origin != query.Origin {
+			log.Info().
+				Str("service", "filter pet").
+				Str("module", "FilterPet reject").Msg("not the origin")
 			continue
 		}
+		log.Info().
+			Str("service", "filter pet").
+			Str("module", "FilterPet accept").Interface("pet", p).Msgf("pet accepted")
 		results = append(results, p)
 	}
 	*in = results
