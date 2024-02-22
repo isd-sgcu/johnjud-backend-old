@@ -98,27 +98,9 @@ func (s *Service) FindAll(_ context.Context, req *proto.FindAllPetRequest) (res 
 		log.Error().Err(err).Str("service", "event").Str("module", "find all").Msg("Error while querying all events")
 		return nil, status.Error(codes.Unavailable, "Internal error")
 	}
-	log.Info().
-		Str("service", "pet").
-		Str("module", "repo.FindAll").Interface("pets", pets).Msg("")
-	log.Info().
-		Str("service", "pet").
-		Str("module", "repo.FindAll").Msgf("number: %d", len(pets))
 
 	petUtils.FilterPet(&pets, req)
-	log.Info().
-		Str("service", "pet").
-		Str("module", "filtered pets").Interface("filteredPets", pets).Msg("")
-	log.Info().
-		Str("service", "pet").
-		Str("module", "filtered pets").Msgf("number: %d", len(pets))
 	petUtils.PaginatePets(&pets, req.Page, req.PageSize, &metaData)
-	log.Info().
-		Str("service", "pet").
-		Str("module", "paginated pets").Interface("paginatedPets", pets).Msg("")
-	log.Info().
-		Str("service", "pet").
-		Str("module", "paginated pets").Msgf("number: %d", len(pets))
 
 	for _, pet := range pets {
 		images, err := s.imageService.FindByPetId(pet.ID.String())
@@ -128,12 +110,6 @@ func (s *Service) FindAll(_ context.Context, req *proto.FindAllPetRequest) (res 
 		imagesList[pet.ID.String()] = images
 	}
 	petWithImages, err := petUtils.RawToDtoList(&pets, imagesList, req)
-	log.Info().
-		Str("service", "pet").
-		Str("module", "pet with images").Interface("petWithImages", petWithImages).Msg("")
-	log.Info().
-		Str("service", "pet").
-		Str("module", "pet with images").Msgf("number: %d", len(pets))
 
 	if err != nil {
 		return nil, status.Error(codes.Internal, fmt.Sprintf("error converting raw to dto list: %v", err))
