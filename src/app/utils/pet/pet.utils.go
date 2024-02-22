@@ -37,7 +37,7 @@ func FilterPet(in *[]*pet.Pet, query *proto.FindAllPetRequest) error {
 		if !res {
 			log.Info().
 				Str("service", "filter pet").
-				Str("module", "FilterPet reject").Msg("age not in range")
+				Str("module", "FilterPet reject").Msgf("pet id = %s age not in range", p.ID.String())
 			continue
 		}
 		if query.Search != "" && !strings.Contains(p.Name, query.Search) {
