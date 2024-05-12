@@ -71,9 +71,9 @@ func (t *PetServiceTest) SetupTest() {
 			IsVaccinated: true,
 			IsVisible:    true,
 			Origin:       faker.Paragraph(),
-			Address:      faker.Paragraph(),
+			Owner:        faker.Paragraph(),
 			Contact:      faker.Paragraph(),
-			AdoptBy:      "",
+			Tel:          "",
 		}
 		var images []*img_proto.Image
 		var imageUrls []string
@@ -108,7 +108,7 @@ func (t *PetServiceTest) SetupTest() {
 		IsVaccinated: t.Pet.IsVaccinated,
 		IsVisible:    t.Pet.IsVisible,
 		Origin:       t.Pet.Origin,
-		Address:      t.Pet.Address,
+		Owner:        t.Pet.Owner,
 		Contact:      t.Pet.Contact,
 		Images:       t.Images,
 	}
@@ -132,7 +132,7 @@ func (t *PetServiceTest) SetupTest() {
 		IsVaccinated: t.Pet.IsVaccinated,
 		IsVisible:    t.Pet.IsVisible,
 		Origin:       t.Pet.Origin,
-		Address:      t.Pet.Address,
+		Owner:        t.Pet.Owner,
 		Contact:      t.Pet.Contact,
 	}
 
@@ -156,7 +156,7 @@ func (t *PetServiceTest) SetupTest() {
 		IsVaccinated: t.Pet.IsVaccinated,
 		IsVisible:    false,
 		Origin:       t.Pet.Origin,
-		Address:      t.Pet.Address,
+		Owner:        t.Pet.Owner,
 		Contact:      t.Pet.Contact,
 	}
 
@@ -176,7 +176,7 @@ func (t *PetServiceTest) SetupTest() {
 			IsVaccinated: t.Pet.IsVaccinated,
 			IsVisible:    t.Pet.IsVaccinated,
 			Origin:       t.Pet.Origin,
-			Address:      t.Pet.Address,
+			Owner:        t.Pet.Owner,
 			Contact:      t.Pet.Contact,
 		},
 	}
@@ -198,7 +198,7 @@ func (t *PetServiceTest) SetupTest() {
 			IsVaccinated: t.Pet.IsVaccinated,
 			IsVisible:    t.Pet.IsVisible,
 			Origin:       t.Pet.Origin,
-			Address:      t.Pet.Address,
+			Owner:        t.Pet.Owner,
 			Contact:      t.Pet.Contact,
 		},
 	}
@@ -228,14 +228,14 @@ func (t *PetServiceTest) SetupTest() {
 		IsVaccinated: t.Pet.IsVaccinated,
 		IsVisible:    t.Pet.IsVisible,
 		Origin:       t.Pet.Origin,
-		Address:      t.Pet.Address,
+		Owner:        t.Pet.Owner,
 		Contact:      t.Pet.Contact,
-		AdoptBy:      faker.UUIDDigit(),
+		Tel:          t.Pet.Tel,
 	}
 
 	t.AdoptByReq = &proto.AdoptPetRequest{
 		PetId:  t.ChangeAdoptBy.ID.String(),
-		UserId: t.ChangeAdoptBy.AdoptBy,
+		UserId: t.ChangeAdoptBy.Owner,
 	}
 
 }
@@ -379,7 +379,7 @@ func createPets() []*pet.Pet {
 			IsVaccinated: true,
 			IsVisible:    true,
 			Origin:       faker.Paragraph(),
-			Address:      faker.Paragraph(),
+			Owner:        faker.Paragraph(),
 			Contact:      faker.Paragraph(),
 		}
 		result = append(result, r)
@@ -408,7 +408,7 @@ func (t *PetServiceTest) createPetsDto(in []*pet.Pet, imagesList [][]*img_proto.
 			IsVaccinated: p.IsVaccinated,
 			IsVisible:    p.IsVisible,
 			Origin:       p.Origin,
-			Address:      p.Address,
+			Owner:        p.Owner,
 			Contact:      p.Contact,
 		}
 
@@ -438,7 +438,7 @@ func (t *PetServiceTest) TestCreateSuccess() {
 		IsVaccinated: t.Pet.IsVaccinated,
 		IsVisible:    t.Pet.IsVisible,
 		Origin:       t.Pet.Origin,
-		Address:      t.Pet.Address,
+		Owner:        t.Pet.Owner,
 		Contact:      t.Pet.Contact,
 	}
 
@@ -475,7 +475,7 @@ func (t *PetServiceTest) TestCreateInternalErr() {
 		IsVaccinated: t.Pet.IsVaccinated,
 		IsVisible:    t.Pet.IsVisible,
 		Origin:       t.Pet.Origin,
-		Address:      t.Pet.Address,
+		Owner:        t.Pet.Owner,
 		Contact:      t.Pet.Contact,
 	}
 
