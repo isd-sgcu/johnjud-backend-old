@@ -112,9 +112,9 @@ func RawToDto(in *pet.Pet, images []*imageProto.Image) *proto.Pet {
 		IsVaccinated: in.IsVaccinated,
 		IsVisible:    in.IsVisible,
 		Origin:       in.Origin,
-		Address:      in.Address,
+		Owner:        in.Owner,
 		Contact:      in.Contact,
-		AdoptBy:      in.AdoptBy,
+		Tel:          in.Tel,
 	}
 }
 
@@ -163,9 +163,9 @@ func DtoToRaw(in *proto.Pet) (res *pet.Pet, err error) {
 		IsVaccinated: in.IsVaccinated,
 		IsVisible:    in.IsVisible,
 		Origin:       in.Origin,
-		Address:      in.Address,
+		Owner:        in.Owner,
 		Contact:      in.Contact,
-		AdoptBy:      in.AdoptBy,
+		Tel:          in.Tel,
 	}, nil
 }
 

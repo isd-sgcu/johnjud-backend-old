@@ -19,7 +19,7 @@ type Pet struct {
 	IsVaccinated bool       `json:"is_vaccinated"`
 	IsVisible    bool       `json:"is_visible"`
 	Origin       string     `json:"origin" gorm:"tinytext"`
-	Address      string     `json:"address" gorm:"tinytext"`
+	Owner        string     `json:"owner" gorm:"tinytext"`
 	Contact      string     `json:"contact" gorm:"tinytext"`
-	AdoptBy      string     `json:"adopt_by" gorm:"tinytext"`
+	Tel          string     `json:"tel" gorm:"tinytext"`
 }

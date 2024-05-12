@@ -169,7 +169,7 @@ func (s *Service) AdoptPet(ctx context.Context, req *proto.AdoptPetRequest) (res
 	if err != nil {
 		return nil, status.Error(codes.Internal, "error converting dto to raw")
 	}
-	pet.AdoptBy = req.UserId
+	pet.Owner = req.UserId
 
 	err = s.repository.Update(req.PetId, pet)
 	if err != nil {
